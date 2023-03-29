@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { JsonTypeNames } from "../lib/Types";
     import { copyText, hasWhiteSpace, isInteger } from "../lib/Util";
 	export let key: string = "";
 	export let value: string|null = "";
@@ -51,7 +52,7 @@
 			<button type="button" on:click={() => { copyText(currentPath) }}>Copy Path</button>
 			<button type="button" on:click={() => { copyText(key) }}>Copy Key</button>
 			<button type="button" on:click={() => { copyText(value) }}>Copy Value</button> -->
-			<div class="path" style:display="inline-block">{currentPath} : <i>{valueType}</i></div>
+			<div class="path" style:display="inline-block">{currentPath} : <i>{JsonTypeNames[valueType]}</i></div>
 		</div>
 	{/if}
 </li>

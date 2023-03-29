@@ -1,6 +1,11 @@
 :root {
-  font-family: Calibri, Deja Vu Sans, Ubuntu, Arial, sans-serif;
-  background-color: #ECECEC;
+	font-family: Calibri, Deja Vu Sans, Ubuntu, Arial, sans-serif;
+	background-color: #ECECEC;
+	padding: 0;
+}
+
+body {
+	padding: 0;
 }
 
 @media (prefers-color-scheme: dark) {

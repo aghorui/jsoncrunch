@@ -36,6 +36,8 @@
 		padding: 5px;
 		font-size: 10px;
 		font-family: monospace;
+		overflow: auto;
+		white-space: nowrap;
 	}
 
 	.objectwrapper {

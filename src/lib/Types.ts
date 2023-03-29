@@ -59,6 +59,7 @@ export type ContextMenuEvent = {
 	isPinned: boolean,
 	target: object,
 	path: string,
+	type: JsonType,
 	x: number,
 	y: number
 };

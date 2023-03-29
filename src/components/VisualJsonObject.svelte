@@ -39,6 +39,7 @@
 			togglePin: () => { persistentHighlight = !persistentHighlight; },
 			target: targetObject,
 			path: currentPath,
+			type: JsonType.OBJECT,
 			x: e.clientX,
 			y: e.clientY
 		}
@@ -47,10 +48,12 @@
 
 </script>
 
+<!-- svelte-ignore a11y-click-events-have-key-events -->
 <li class="title"
 	on:contextmenu={dispatchContextMenu}
 	on:mouseenter={() => {isHighlighted = true;}}
 	on:mouseleave={() => {isHighlighted = false;}}
+	on:click={() => {persistentHighlight = !persistentHighlight}}
 	style:background-color={titleBackgroundColor}>
 	<div class="title-label" style:background-color={titleColor}>
 		{title}
@@ -58,9 +61,9 @@
 
 	{#if isHighlighted}
 		<div style:display="inline-block">
-			<button type="button" on:click={() => {persistentHighlight = !persistentHighlight}}>
+			<!-- <button type="button" on:click={() => {persistentHighlight = !persistentHighlight}}>
 				{#if persistentHighlight}Unpin{:else}Pin{/if}
-			</button>
+			</button> -->
 			<button type="button">Info</button>
 			<button type="button" disabled={deleteObject === null} on:click={() => {if (deleteObject) deleteObject()}}>Delete</button>
 			<!-- <button type="button">Delete</button>
@@ -80,7 +83,6 @@
 					title={key}
 					deleteObject={createDeleteFunction(key)}
 					targetObject={targetObject[key]}
-					parentObjectReference={targetObject}
 					parentPath={currentPath} />
 			</li>
 		{:else}
