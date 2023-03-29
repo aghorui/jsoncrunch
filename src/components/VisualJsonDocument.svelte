@@ -22,6 +22,8 @@
 		<ul class="objectwrapper">
 			<VisualJsonObject
 				on:contextEvent
+				on:removeContextEvent
+				on:clearContextEvent
 				title={"root"}
 				targetObject={targetDocument}
 				parentPath={""} />
@@ -32,12 +34,11 @@
 <style>
 	.jsondocument {
 		font-size: 10px;
-		margin: 5px;
 		padding: 5px;
-		font-size: 10px;
 		font-family: monospace;
 		overflow: auto;
 		white-space: nowrap;
+		flex: 1;
 	}
 
 	.objectwrapper {

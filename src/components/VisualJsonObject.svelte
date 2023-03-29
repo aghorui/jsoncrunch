@@ -46,6 +46,14 @@
 		dispatch("contextEvent", detail)
 	}
 
+	function clearContextMenu(e: MouseEvent) {
+		dispatch("clearContextEvent")
+	}
+
+	function contextMenuRemoveElement(e: MouseEvent) {
+		dispatch("removeContextEvent", { key: currentPath })
+	}
+
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -53,7 +61,13 @@
 	on:contextmenu={dispatchContextMenu}
 	on:mouseenter={() => {isHighlighted = true;}}
 	on:mouseleave={() => {isHighlighted = false;}}
-	on:click={() => {persistentHighlight = !persistentHighlight}}
+	on:click={(e) => {persistentHighlight = !persistentHighlight;
+			if (persistentHighlight) {
+				dispatchContextMenu(e);
+			} else {
+				contextMenuRemoveElement(e);
+			}
+		}}
 	style:background-color={titleBackgroundColor}>
 	<div class="title-label" style:background-color={titleColor}>
 		{title}
@@ -64,12 +78,18 @@
 			<!-- <button type="button" on:click={() => {persistentHighlight = !persistentHighlight}}>
 				{#if persistentHighlight}Unpin{:else}Pin{/if}
 			</button> -->
-			<button type="button">Info</button>
-			<button type="button" disabled={deleteObject === null} on:click={() => {if (deleteObject) deleteObject()}}>Delete</button>
-			<!-- <button type="button">Delete</button>
-			<button type="button" on:click={() => { copyText(currentPath) }}>Copy Path</button> -->
-			<button type="button" on:click={() => { copyText(JSON.stringify(targetObject, null, 4)) }}>Copy JSON</button>
-			<div class="path" style:display="inline-block">{currentPath} : <i>Object</i></div>
+
+			<button on:click|stopPropagation type="button">Info</button>
+
+			<button type="button" disabled={deleteObject === null} on:click|stopPropagation={() => {if (deleteObject) deleteObject()}}>Delete</button>
+
+			<!-- <button type="button">Delete</button>-->
+
+			<button type="button" on:click|stopPropagation={() => { copyText(currentPath) }}>Copy Path</button>
+
+			<button type="button" on:click|stopPropagation={() => { copyText(JSON.stringify(targetObject, null, 4)) }}>Copy JSON</button>
+
+			<div class="path" on:click|stopPropagation style:display="inline-block">{currentPath} : <i>Object</i></div>
 		</div>
 	{/if}
 </li>

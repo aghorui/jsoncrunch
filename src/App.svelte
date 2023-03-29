@@ -1,5 +1,7 @@
 <script lang="ts">
-    import Notification from './components/Notification.svelte';
+    import MenuBar from './components/MenuBar.svelte';
+import Notification from './components/Notification.svelte';
+    import PropertiesView from './components/PropertiesView.svelte';
 	import VisualJsonContextMenu from './components/VisualJsonContextMenu.svelte';
 	import VisualJsonDocument from './components/VisualJsonDocument.svelte';
 	import { pageTitle } from './lib/State';
@@ -41,6 +43,7 @@
 	let contextMenuTargetType: JsonType = JsonType.INVALID;
 	let contextMenuDelete: () => void = null;
 	let contextMenuTogglePin: () => void = null;
+	let contextMenuTargetSet: Map<string, object> = new Map<string, object>();
 
 	function showContextMenu(e) {
 		contextMenuShown = true;
@@ -53,6 +56,21 @@
 		contextMenuDelete = e.detail.deleteObject;
 		contextMenuFocused = true;
 		console.log(e, contextMenuX, contextMenuY);
+		contextMenuTargetSet.set(e.detail.path, e.detail);
+		contextMenuTargetSet = contextMenuTargetSet
+		console.log("thing: ", contextMenuTargetSet)
+	}
+
+	function clearContextMenu(e) {
+		contextMenuShown = false;
+		contextMenuTargetSet.clear();
+		contextMenuTargetSet = contextMenuTargetSet
+	}
+
+	function contextMenuRemoveElement(e) {
+		console.log("removing ", e.detail.key)
+		contextMenuTargetSet.delete(e.detail.key)
+		contextMenuTargetSet = contextMenuTargetSet
 	}
 </script>
 
@@ -65,19 +83,31 @@
 <!-- 	<div style="width:100%; box-sizing: border-box; position: fixed:">
 		<Notification text="test notification" />
 	</div> -->
-	<VisualJsonContextMenu
-		bind:contextMenuFocused={contextMenuFocused}
-		bind:isShown={contextMenuShown}
-		target={contextMenuTarget}
-		path={contextMenuTargetPath}
-		targetType={contextMenuTargetType}
-		togglePin={contextMenuTogglePin}
-		deleteObject={contextMenuDelete}
-		x={contextMenuX}
-		y={contextMenuY} />
 
-	<VisualJsonDocument
-		on:contextEvent={showContextMenu}
-		targetDocument={sampleData}
-		targetDocumentName={"sampleData"}  />
+<div style="display: flex; flex-direction: column; max-height: 100vh;">
+	<MenuBar />
+	<div style="display: flex; flex-direction: row; flex: 1; max-height: calc(100vh - 30px);">
+		<div style="flex: 1; display: flex; flex-direction: column; max-height: calc(100vh - 30px);">
+			<VisualJsonContextMenu
+				bind:contextMenuFocused={contextMenuFocused}
+				bind:isShown={contextMenuShown}
+				bind:targetSet={contextMenuTargetSet}
+				target={contextMenuTarget}
+				path={contextMenuTargetPath}
+				targetType={contextMenuTargetType}
+				togglePin={contextMenuTogglePin}
+				deleteObject={contextMenuDelete}
+				x={contextMenuX}
+				y={contextMenuY} />
+			<VisualJsonDocument
+				on:contextEvent={showContextMenu}
+				on:clearContextEvent={clearContextMenu}
+				on:removeContextEvent={contextMenuRemoveElement}
+				targetDocument={sampleData}
+				targetDocumentName={"sampleData"}/>
+		</div>
+
+		<PropertiesView />
+	</div>
+</div>
 </main>

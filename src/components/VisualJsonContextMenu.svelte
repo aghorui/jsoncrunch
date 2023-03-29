@@ -10,20 +10,19 @@
 	export let isShown: boolean = true;
 	export let deleteObject: () => void = null;
 	export let togglePin: () => void = null;
-	export let contextMenuFocused = false;
+	export let contextMenuFocused: boolean = false;
+	export let targetSet: Map<string, object> = null;
 </script>
 
-{#if isShown}
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<div class="context-menu-container">
+
 <div class="context-menu"
 	style:top={`${y}px`}
 	style:left={`${x}px`}
 	on:mouseenter={() => { contextMenuFocused = true; }}
 	on:mouseleave={() => { contextMenuFocused = false; }}>
-
-	<button disabled={true} class="title">{path} : <i>{JsonTypeNames[targetType]}</button>
+{#if isShown}
 
 	<button type="button" on:click={togglePin} disabled={togglePin === null}>
 		{#if target.persistentHighlight}Unpin{:else}Pin{/if}
@@ -38,20 +37,22 @@
 	<button type="button" on:click={() => { copyText(target.key) }}>Copy Key</button>
 
 	<button type="button" on:click={() => { copyText(target.value) }}>Copy Value</button>
-</div>
-</div>
 
+
+	<button disabled={true} class="title">{path} : <i>{JsonTypeNames[targetType]}</button>
+
+	<span>Num Selected: {targetSet.size}</span>
+{:else}
+	<span>Nothing Selected.</span>
 {/if}
+</div>
 
 <style>
 	button {
 		background: none;
-		display: block;
-		width: 100%;
 		border: none;
 		border-top: 1px solid black;
 		text-align: left;
-		font-size: 12px;
 		padding: 3px;
 		margin: 0;
 	}
@@ -64,14 +65,14 @@
 		background-color: #888888;
 	}
 
-	.context-menu-container {
+/*	.context-menu-container {
 		position: fixed;
 		left: 0;
 		top: 0;
 		width: 100vw;
 		height: 100vh;
-/*		background-color: #444444;
-*/		z-index: 10000;
+		background-color: #444444;
+		z-index: 10000;
 	}
 
 	.context-menu {
@@ -82,8 +83,24 @@
 		z-index: 10000;
 		padding: 0;
 	}
+*/
+
+	.context-menu {
+		background-color: #e4e6d3;
+		border-bottom: 1px solid gray;
+		display: flex;
+		align-items: center;
+		align-content: center;
+		height: 30px;
+		font-size: 12px;
+		padding: 3px;
+		box-sizing: border-box;
+		box-shadow: 0 2px 2px #44444444;
+		clip-path: polygon(0 0, 100% 0, 100% 200%, 0 200%);
+	}
 
 	.title {
+		text-align: right;
 		border: none;
 		background-color: #444444;
 		font-weight: bold;
