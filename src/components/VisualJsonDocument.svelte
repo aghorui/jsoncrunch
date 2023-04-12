@@ -39,6 +39,7 @@
 		overflow: auto;
 		white-space: nowrap;
 		flex: 1;
+		box-shadow: 0px 5px 5px -4px rgba(0,0,0,0.4) inset;
 	}
 
 	.objectwrapper {

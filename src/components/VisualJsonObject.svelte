@@ -3,6 +3,7 @@
 	import { getJsonType, JsonType, type ContextMenuEvent } from "../lib/Types";
 	import { copyText, hasWhiteSpace, isInteger, getIndexRepresentation } from "../lib/Util";
 	import VisualJsonValue from "./VisualJsonValue.svelte";
+    import { contextMenuTargetSet } from "../lib/State";
 
 	const dispatch = createEventDispatcher()
 
@@ -23,6 +24,7 @@
 	$: titleColor = isHighlighted ? "lightyellow" : "#FAFAFA";
 	$: toolbarVisible = isHighlighted ? "visible" : "none";
 	$: currentPath =  parentPath + getIndexRepresentation(title, parentPath);
+	$: persistentHighlight = $contextMenuTargetSet.has(currentPath);
 
 	function createDeleteFunction(index: number | string): () => void {
 		return () => {
@@ -31,7 +33,7 @@
 		}
 	}
 
-	function dispatchContextMenu(e: MouseEvent) {
+	function contextMenuAddElement(e: MouseEvent) {
 		e.preventDefault();
 		let detail: ContextMenuEvent = {
 			deleteObject: deleteObject,
@@ -40,14 +42,11 @@
 			target: targetObject,
 			path: currentPath,
 			type: JsonType.OBJECT,
+			isMultiselect: e.ctrlKey || e.metaKey,
 			x: e.clientX,
 			y: e.clientY
 		}
 		dispatch("contextEvent", detail)
-	}
-
-	function clearContextMenu(e: MouseEvent) {
-		dispatch("clearContextEvent")
 	}
 
 	function contextMenuRemoveElement(e: MouseEvent) {
@@ -58,12 +57,12 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <li class="title"
-	on:contextmenu={dispatchContextMenu}
+	on:contextmenu={contextMenuAddElement}
 	on:mouseenter={() => {isHighlighted = true;}}
 	on:mouseleave={() => {isHighlighted = false;}}
 	on:click={(e) => {persistentHighlight = !persistentHighlight;
 			if (persistentHighlight) {
-				dispatchContextMenu(e);
+				contextMenuAddElement(e);
 			} else {
 				contextMenuRemoveElement(e);
 			}
@@ -81,7 +80,7 @@
 
 			<button on:click|stopPropagation type="button">Info</button>
 
-			<button type="button" disabled={deleteObject === null} on:click|stopPropagation={() => {if (deleteObject) deleteObject()}}>Delete</button>
+			<!-- <button type="button" disabled={deleteObject === null} on:click|stopPropagation={() => {if (deleteObject) deleteObject()}}>Delete</button> -->
 
 			<!-- <button type="button">Delete</button>-->
 
@@ -100,6 +99,8 @@
 			<li>
 				<svelte:self
 					on:contextEvent
+					on:removeContextEvent
+					on:clearContextEvent
 					title={key}
 					deleteObject={createDeleteFunction(key)}
 					targetObject={targetObject[key]}
@@ -108,6 +109,8 @@
 		{:else}
 			<VisualJsonValue
 				on:contextEvent
+				on:removeContextEvent
+				on:clearContextEvent
 				key={key}
 				value={targetObject[key]}
 				parentPath={currentPath}

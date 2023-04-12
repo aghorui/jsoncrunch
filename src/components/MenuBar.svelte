@@ -17,7 +17,7 @@
 		background-color: black;
 		color: white;
 		display: block;
-		height: 30px;
+		height: 24px;
 		display: flex;
 		align-items: center;
 		align-content: center;

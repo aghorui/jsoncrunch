@@ -1,13 +1,13 @@
 <script lang="ts">
-    import { isUndefinedOrNull, JsonType, JsonTypeNames } from "../lib/Types";
+	import { isUndefinedOrNull, JsonType, JsonTypeNames, ViewportViewType } from "../lib/Types";
 	import { copyText } from "../lib/Util";
+	import ToggleSelector from "./ToggleSelector.svelte";
 
 	export let target: any = null;
 	export let path: string = "(no path)";
 	export let targetType: JsonType = JsonType.INVALID;
 	export let x: number = 110;
 	export let y: number = 110;
-	export let isShown: boolean = true;
 	export let deleteObject: () => void = null;
 	export let togglePin: () => void = null;
 	export let contextMenuFocused: boolean = false;
@@ -22,13 +22,15 @@
 	style:left={`${x}px`}
 	on:mouseenter={() => { contextMenuFocused = true; }}
 	on:mouseleave={() => { contextMenuFocused = false; }}>
-{#if isShown}
-
+{#if targetSet.size > 0}
 	<button type="button" on:click={togglePin} disabled={togglePin === null}>
 		{#if target.persistentHighlight}Unpin{:else}Pin{/if}
 	</button>
 
 	<button type="button">Info</button>
+
+
+	<button type="button" disabled={deleteObject === null}>Subtree</button>
 
 	<button type="button" on:click={deleteObject} disabled={deleteObject === null}>Delete</button>
 
@@ -38,23 +40,38 @@
 
 	<button type="button" on:click={() => { copyText(target.value) }}>Copy Value</button>
 
+	{#if targetSet.size > 1}
+		<button type="button" on:click={() => { copyText(target.value) }}>Unselect All</button>
+	{/if}
 
-	<button disabled={true} class="title">{path} : <i>{JsonTypeNames[targetType]}</button>
+	<div class="spacer"> </div>
 
-	<span>Num Selected: {targetSet.size}</span>
+	{#if targetSet.size === 1}
+		<button disabled={true} class="title">{path} : <i>{JsonTypeNames[targetType]}</button>
+	{/if}
+
+	{#if targetSet.size > 1}
+		<span class="status">Num Selected: {targetSet.size}</span>
+	{/if}
+
 {:else}
-	<span>Nothing Selected.</span>
+	<span class="status">Nothing Selected.</span>
+
+	<div class="spacer"> </div>
 {/if}
 </div>
 
 <style>
 	button {
-		background: none;
-		border: none;
-		border-top: 1px solid black;
-		text-align: left;
+		font-size: 10px;
+		background: white;
+		border: 1px solid grey;
+		border-radius: 3px;
 		padding: 3px;
-		margin: 0;
+		margin-left: 2px;
+		margin-right: 2px;
+		display: inline-block;
+		box-sizing: border-box;
 	}
 
 	button:hover {
@@ -86,17 +103,29 @@
 */
 
 	.context-menu {
-		background-color: #e4e6d3;
-		border-bottom: 1px solid gray;
+		background-color: #E9E9E9;
 		display: flex;
 		align-items: center;
 		align-content: center;
 		height: 30px;
-		font-size: 12px;
 		padding: 3px;
 		box-sizing: border-box;
-		box-shadow: 0 2px 2px #44444444;
-		clip-path: polygon(0 0, 100% 0, 100% 200%, 0 200%);
+		flex: 1;
+	}
+
+	.status {
+		font-size: 12px;
+		margin-left: 4px;
+		margin-right: 4px;
+	}
+
+	.spacer {
+		flex: 1;
+	}
+
+	.context-menu > * {
+		flex-shrink: 0;
+		padding: 3px;
 	}
 
 	.title {

@@ -23,6 +23,19 @@ export const JsonTypeNames = {
 
 export type JsonValue = number | string | boolean | object | Array<any> | null
 
+export type JsonPath = [number | string]
+
+/**
+ * Describes the current view in the main viewport.
+ *
+ * @class      ViewportViewType (name)
+ */
+export enum ViewportViewType {
+	VISUAL,
+	SOURCE,
+	METADICT
+}
+
 /**
  * Describes an object idiom.
  */
@@ -60,6 +73,7 @@ export type ContextMenuEvent = {
 	target: object,
 	path: string,
 	type: JsonType,
+	isMultiselect: boolean,
 	x: number,
 	y: number
 };
@@ -81,7 +95,7 @@ export function isObjectAndNotArray(value: any): boolean {
  * @return     {boolean}  True if the specified value is array, False otherwise.
  */
 export function isArray(value: any): boolean {
-	return value.constructor === Array;
+	return typeof value === 'object' && value !== null && value.constructor === Array;
 }
 
 /**

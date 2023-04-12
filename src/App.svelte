@@ -1,11 +1,14 @@
 <script lang="ts">
-    import MenuBar from './components/MenuBar.svelte';
-import Notification from './components/Notification.svelte';
-    import PropertiesView from './components/PropertiesView.svelte';
-	import VisualJsonContextMenu from './components/VisualJsonContextMenu.svelte';
+	import AboutPopup from './components/AboutPopup.svelte';
+	import MenuBar from './components/MenuBar.svelte';
+	import Notification from './components/Notification.svelte';
+	import PropertiesView from './components/PropertiesView.svelte';
+	import ContextMenu from './components/ContextMenu.svelte';
 	import VisualJsonDocument from './components/VisualJsonDocument.svelte';
-	import { pageTitle } from './lib/State';
-	import { JsonType, type ContextMenuEvent } from './lib/Types';
+	import { contextMenuTargetSet, currentView, pageTitle } from './lib/State';
+	import { JsonType, ViewportViewType, type ContextMenuEvent } from './lib/Types';
+    import TextView from './components/TextView.svelte';
+    import ToggleSelector from './components/ToggleSelector.svelte';
 
 	let sampleData: object = {"widget": {
     "debug": "on",
@@ -34,6 +37,8 @@ import Notification from './components/Notification.svelte';
     }
 }};
 
+	let textInputJson: string = JSON.stringify(sampleData, null, 4)
+
 	let contextMenuFocused: boolean = false;
 	let contextMenuShown: boolean = false;
 	let contextMenuX: number = 0;
@@ -43,7 +48,9 @@ import Notification from './components/Notification.svelte';
 	let contextMenuTargetType: JsonType = JsonType.INVALID;
 	let contextMenuDelete: () => void = null;
 	let contextMenuTogglePin: () => void = null;
-	let contextMenuTargetSet: Map<string, object> = new Map<string, object>();
+
+	let notificationShown:boolean = false;
+	let notificationText = "";
 
 	function showContextMenu(e) {
 		contextMenuShown = true;
@@ -56,21 +63,35 @@ import Notification from './components/Notification.svelte';
 		contextMenuDelete = e.detail.deleteObject;
 		contextMenuFocused = true;
 		console.log(e, contextMenuX, contextMenuY);
-		contextMenuTargetSet.set(e.detail.path, e.detail);
-		contextMenuTargetSet = contextMenuTargetSet
+
+		if (!e.detail.isMultiselect) {
+			$contextMenuTargetSet.clear()
+		}
+
+		$contextMenuTargetSet.set(e.detail.path, e.detail);
+		$contextMenuTargetSet = $contextMenuTargetSet
+
 		console.log("thing: ", contextMenuTargetSet)
 	}
 
 	function clearContextMenu(e) {
 		contextMenuShown = false;
-		contextMenuTargetSet.clear();
-		contextMenuTargetSet = contextMenuTargetSet
+		$contextMenuTargetSet.clear();
+		$contextMenuTargetSet = $contextMenuTargetSet
 	}
 
 	function contextMenuRemoveElement(e) {
 		console.log("removing ", e.detail.key)
-		contextMenuTargetSet.delete(e.detail.key)
-		contextMenuTargetSet = contextMenuTargetSet
+		$contextMenuTargetSet.delete(e.detail.key)
+		$contextMenuTargetSet = $contextMenuTargetSet
+	}
+
+	$: try {
+		sampleData = JSON.parse(textInputJson)
+	} catch (e) {
+		console.log(e);
+		notificationShown = true;
+		notificationText = e.toString();
 	}
 </script>
 
@@ -80,34 +101,67 @@ import Notification from './components/Notification.svelte';
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <main on:click={() => { if (!contextMenuFocused) { contextMenuShown = false; } }}>
-<!-- 	<div style="width:100%; box-sizing: border-box; position: fixed:">
-		<Notification text="test notification" />
-	</div> -->
+	<div class="notification-container">
+		<Notification bind:shown={notificationShown} bind:text={notificationText} />
+	</div>
 
-<div style="display: flex; flex-direction: column; max-height: 100vh;">
+<!-- <AboutPopup /> -->
+
+<div style="display: flex; flex-direction: column; flex-shrink: 0; max-height: 100vh; height: 100vh;">
 	<MenuBar />
-	<div style="display: flex; flex-direction: row; flex: 1; max-height: calc(100vh - 30px);">
-		<div style="flex: 1; display: flex; flex-direction: column; max-height: calc(100vh - 30px);">
-			<VisualJsonContextMenu
-				bind:contextMenuFocused={contextMenuFocused}
-				bind:isShown={contextMenuShown}
-				bind:targetSet={contextMenuTargetSet}
-				target={contextMenuTarget}
-				path={contextMenuTargetPath}
-				targetType={contextMenuTargetType}
-				togglePin={contextMenuTogglePin}
-				deleteObject={contextMenuDelete}
-				x={contextMenuX}
-				y={contextMenuY} />
-			<VisualJsonDocument
-				on:contextEvent={showContextMenu}
-				on:clearContextEvent={clearContextMenu}
-				on:removeContextEvent={contextMenuRemoveElement}
-				targetDocument={sampleData}
-				targetDocumentName={"sampleData"}/>
+	<div style="display: flex; flex-direction: row; flex: 1;">
+		<div style="flex: 1; display: flex; flex-direction: column; max-height: calc(100vh - 32px);">
+
+			<div style="display: flex; flex-direction: row; border-bottom: 1px solid black;">
+				<ContextMenu
+					bind:contextMenuFocused={contextMenuFocused}
+					bind:targetSet={$contextMenuTargetSet}
+					target={contextMenuTarget}
+					path={contextMenuTargetPath}
+					targetType={contextMenuTargetType}
+					togglePin={contextMenuTogglePin}
+					deleteObject={contextMenuDelete}
+					x={contextMenuX}
+					y={contextMenuY} />
+				<ToggleSelector
+					options={
+						[
+							{ key: "Visual",   value: ViewportViewType.VISUAL,   enabled: true},
+							{ key: "Source",   value: ViewportViewType.SOURCE,   enabled: true},
+							{ key: "Metadict", value: ViewportViewType.METADICT, enabled: false}
+						]
+					}
+					currentSelected={currentView} />
+			</div>
+
+			{#if $currentView === ViewportViewType.VISUAL}
+				<VisualJsonDocument
+					on:contextEvent={showContextMenu}
+					on:removeContextEvent={contextMenuRemoveElement}
+					targetDocument={sampleData}
+					targetDocumentName={"sampleData"}/>
+
+			{:else if $currentView === ViewportViewType.SOURCE}
+				<TextView bind:code={textInputJson} />
+
+			{:else if $currentView === ViewportViewType.METADICT}
+				<TextView code={JSON.stringify(sampleData, null, 4)} />
+
+			{:else}
+				<p>Congratulations! You've found a bug!</p>
+
+			{/if}
 		</div>
 
 		<PropertiesView />
 	</div>
 </div>
 </main>
+
+<style>
+	.notification-container {
+		position: fixed;
+		width: 100%;
+		z-index: 20000;
+	}
+</style>

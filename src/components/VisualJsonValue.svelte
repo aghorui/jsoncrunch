@@ -44,9 +44,6 @@
 
 	{#if isHighlighted}
 		<div class="toolbar" style:display="inline-block">
-			<button type="button" on:click={() => {persistentHighlight = !persistentHighlight}}>
-				{#if persistentHighlight}Unpin{:else}Pin{/if}
-			</button>
 			<button type="button">Info</button>
 			<!-- <button type="button">Delete</button>
 			<button type="button" on:click={() => { copyText(currentPath) }}>Copy Path</button>
