@@ -1,3 +1,5 @@
+import { createEmptyObject, getObjectElement } from "./Util";
+
 /**
  * Represents a Valid JSON-representable type.
  */
@@ -23,7 +25,14 @@ export const JsonTypeNames = {
 
 export type JsonValue = number | string | boolean | object | Array<any> | null
 
-export type JsonPath = [number | string]
+export type JsonPathIndex = number | string
+
+export type JsonPath = Array<JsonPathIndex>
+
+export type ToggleSelectorOptions = { key: string, value: any, enabled: boolean };
+
+export type Operation = { name: string, params?: any }
+
 
 /**
  * Describes the current view in the main viewport.
@@ -67,17 +76,99 @@ export enum StringIdiom {
  * Describes a right click menu for a json document.
  */
 export type ContextMenuEvent = {
-	deleteObject: () => void,
-	togglePin: () => void,
-	isPinned: boolean,
-	target: object,
-	path: string,
-	type: JsonType,
-	isMultiselect: boolean,
-	x: number,
-	y: number
+	deleteObject: () => void, // Object deletor
+	togglePin: () => void, // Pin Toggler
+	isPinned: boolean, // is it pinned?
+	key: string, // The target JSON key
+	value: object, // The target JSON value
+	path: string, // Path to the JSON value
+	type: JsonType, // The type of the JSON value
+	isMultiselect: boolean, // In multiselect mode (hold CTRL mode)
 };
-``
+
+
+// Dictionary based on object and not Map.
+// not implemented.
+/*export class StringDict {
+	data: object
+	constructor() {
+		data
+	}
+}*/
+
+/*
+ * Describes a JSON selection Node
+ */
+
+/*export type JsonSelectionNode = {
+	selected: boolean,
+	children: { [id: string]: JsonSelectionNode } | null
+}*/
+
+/*
+ * Describes a user's selection of JSON elements
+ *
+ * This implementation is probably isnt too useful right now because we can just
+ * check for existence for the path in the case of deletion albeit at some
+ * expense. It might become useful later in other operations.
+ *
+ * @class      JsonSelection (name)
+ */
+
+/*export class JsonSelection {
+	selection: JsonSelectionNode | null
+	count: number = 0
+
+	constructor() {
+		// TODO maybe convert empty object into another class
+		var k: any = createEmptyObject();
+		k["selected"] = false
+		k["children"] = null
+
+		this.selection = k
+	}
+
+	insertNode(node: JsonSelectionNode, name: JsonPathIndex, selected: boolean = false) {
+		if (node.children === null) {
+			node.children = createEmptyObject()
+		}
+
+		node.children[name] = { selected: selected, children: null }
+
+		return node.children[name]
+	}
+
+	addElement(path: JsonPath) {
+		let currentSegment = this.selection;
+		for (let segment of path.slice(0, -1)) {
+			if (Object.hasOwn(currentSegment, segment)) {
+				this.insertNode(currentSegment, segment, false);
+			}
+			currentSegment = currentSegment[segment];
+		}
+
+		// there isn't a need to indicate leaf nodes explicitly.
+		if (Object.hasOwn(currentSegment, path[path.length - 1])) {
+				this.insertNode(currentSegment, path[path.length - 1], false);
+		}
+
+		currentSegment[path[path.length - 1]].selected = true;
+	}
+
+	removeElement(path: JsonPath) {
+		target = getElement(path)
+		parent = getElemebt(path[0:-1])
+		parent.delete(target)
+		if parent has no children {
+			delete parent
+		}
+	}
+
+	getElement(path: JsonPath) {
+		return getObjectElement(k, path);
+	}
+}*/
+
 /**
  * Determines whether the specified value is object and not array.
  *

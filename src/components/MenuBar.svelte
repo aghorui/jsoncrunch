@@ -1,9 +1,9 @@
 <script lang="ts">
-
+	import AppInfo from "../lib/AppInfo";
 </script>
 
 <div class="menubar">
-<div class="item">JsonTx v0.0.0</div>
+<div class="item">JsonTx {AppInfo.appVersion}</div>
 
 <div class="spacer"></div>
 

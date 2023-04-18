@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Writable } from "svelte/store";
+	import type { ToggleSelectorOptions } from "../lib/Types";
 
-	type ToggleSelectorOptions = { key: string, value: any, enabled: boolean };
 
 	export let currentSelected: Writable<any> = null;
 	export let options: Array<ToggleSelectorOptions> = [];
@@ -34,6 +34,7 @@
 </div>
 
 <style>
+
 	.toggle-selector {
 		display: flex;
 		font-size: 12px;
@@ -83,4 +84,5 @@
 		font-style: italic;
 		color: #D0D0D0;
 	}
+
 </style>

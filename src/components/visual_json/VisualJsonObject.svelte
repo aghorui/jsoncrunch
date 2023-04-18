@@ -1,17 +1,20 @@
 <script lang="ts">
-    import { createEventDispatcher, onMount } from "svelte";
-	import { getJsonType, JsonType, type ContextMenuEvent } from "../lib/Types";
-	import { copyText, hasWhiteSpace, isInteger, getIndexRepresentation } from "../lib/Util";
+    import { createEventDispatcher, onDestroy, onMount } from "svelte";
+	import { getJsonType, JsonType, type ContextMenuEvent, type JsonPath } from "../../lib/Types";
+	import { copyText, hasWhiteSpace, isInteger, getIndexRepresentation } from "../../lib/Util";
 	import VisualJsonValue from "./VisualJsonValue.svelte";
-    import { contextMenuTargetSet } from "../lib/State";
+    import { contextMenuTargetSet } from "../../lib/State";
 
 	const dispatch = createEventDispatcher()
 
-	export let parentPath: string = "";
+	export let parentPathString: string = "";
+	export let parentPath: JsonPath = [];
 	export let title: string = "";
 	export let targetObject: object | [any] = {};
 	export let isHighlighted: boolean = false;
-	export let currentPath: string = "";
+	export let currentPathString: string = "";
+	export let currentPath: JsonPath = [ ...parentPath, title ];
+	export let hideChildren: boolean = false;
 
 	export let deleteObject: () => void = null;
 
@@ -23,8 +26,8 @@
 							  "unset");
 	$: titleColor = isHighlighted ? "lightyellow" : "#FAFAFA";
 	$: toolbarVisible = isHighlighted ? "visible" : "none";
-	$: currentPath =  parentPath + getIndexRepresentation(title, parentPath);
-	$: persistentHighlight = $contextMenuTargetSet.has(currentPath);
+	$: currentPathString =  parentPathString + getIndexRepresentation(title, parentPathString);
+	$: persistentHighlight = $contextMenuTargetSet.has(currentPathString);
 
 	function createDeleteFunction(index: number | string): () => void {
 		return () => {
@@ -39,19 +42,23 @@
 			deleteObject: deleteObject,
 			isPinned: persistentHighlight,
 			togglePin: () => { persistentHighlight = !persistentHighlight; },
-			target: targetObject,
-			path: currentPath,
+			key: title,
+			value: targetObject,
+			path: currentPathString,
 			type: JsonType.OBJECT,
-			isMultiselect: e.ctrlKey || e.metaKey,
-			x: e.clientX,
-			y: e.clientY
+			isMultiselect: e.ctrlKey || e.metaKey
 		}
 		dispatch("contextEvent", detail)
+		console.log("sending out: ", detail)
 	}
 
 	function contextMenuRemoveElement(e: MouseEvent) {
-		dispatch("removeContextEvent", { key: currentPath })
+		dispatch("removeContextEvent", { key: currentPathString })
 	}
+
+	onDestroy(() => {
+		console.log("Destroying ", currentPathString)
+	})
 
 </script>
 
@@ -68,12 +75,18 @@
 			}
 		}}
 	style:background-color={titleBackgroundColor}>
+
+<div class="thing-container" style="display: flex; align-items: center;">
+	<div class="line-thing" style="display: flex; align-items: center;">
+		<div class="line-thing-inner"></div>
+	</div>
+
 	<div class="title-label" style:background-color={titleColor}>
 		{title}
 	</div>
 
 	{#if isHighlighted}
-		<div style:display="inline-block">
+		<div style:display="inline-block" style:flex="1" style:padding-left="5px">
 			<!-- <button type="button" on:click={() => {persistentHighlight = !persistentHighlight}}>
 				{#if persistentHighlight}Unpin{:else}Pin{/if}
 			</button> -->
@@ -84,40 +97,57 @@
 
 			<!-- <button type="button">Delete</button>-->
 
-			<button type="button" on:click|stopPropagation={() => { copyText(currentPath) }}>Copy Path</button>
+			<button type="button" on:click|stopPropagation={() => { copyText(currentPathString) }}>Copy Path</button>
 
 			<button type="button" on:click|stopPropagation={() => { copyText(JSON.stringify(targetObject, null, 4)) }}>Copy JSON</button>
 
-			<div class="path" on:click|stopPropagation style:display="inline-block">{currentPath} : <i>Object</i></div>
+			<div class="path" on:click|stopPropagation style:display="inline-block">{currentPathString} : <i>Object</i></div>
 		</div>
 	{/if}
+</div>
+
 </li>
 
-<ul class="objectblock" style:background-color={backgroundColor}>
-	{#each Object.keys(targetObject) as key}
-		{#if getJsonType(targetObject[key]) === JsonType.OBJECT}
-			<li>
-				<svelte:self
+{#if !hideChildren}
+
+<li class="objectblock" style:background-color={backgroundColor}>
+	<ul class="objectblock-inner">
+		{#each Object.keys(targetObject) as key}
+			{#if getJsonType(targetObject[key]) === JsonType.OBJECT}
+				<li class="">
+					<svelte:self
+						on:contextEvent
+						on:removeContextEvent
+						on:clearContextEvent
+						title={key}
+						deleteObject={createDeleteFunction(key)}
+						targetObject={targetObject[key]}
+						parentPathString={currentPathString}
+						parentPath={currentPath} />
+				</li>
+			{:else}
+				<VisualJsonValue
 					on:contextEvent
 					on:removeContextEvent
 					on:clearContextEvent
-					title={key}
-					deleteObject={createDeleteFunction(key)}
-					targetObject={targetObject[key]}
-					parentPath={currentPath} />
-			</li>
-		{:else}
-			<VisualJsonValue
-				on:contextEvent
-				on:removeContextEvent
-				on:clearContextEvent
-				key={key}
-				value={targetObject[key]}
-				parentPath={currentPath}
-				valueType={JsonType[getJsonType(targetObject[key])]} />
-		{/if}
-	{/each}
+					key={key}
+					value={targetObject[key]}
+					parentPath={currentPathString}
+					valueType={JsonType[getJsonType(targetObject[key])]} />
+			{/if}
+		{/each}
+	</ul>
+</li>
+
+{:else}
+
+<ul class="objectblock" style:background-color={backgroundColor}>
+	<li class="hidden-block"><span
+		on:click={() => {hideChildren = false;}}
+		on:keydown={() => {hideChildren = false;}}>...</span></li>
 </ul>
+
+{/if}
 
 <style>
 
@@ -125,17 +155,10 @@
 		font-size: 10px;
 	}
 
-/*	.path {
-		text-overflow: ellipsis;
-		width: 100px;
-		max-width: 100px
-	}*/
-
 	.objectblock {
 		margin-left: 20px;
 		border-left: 1px solid black;
 		padding-left: 0;
-		padding-top: 5px;
 		padding-bottom: 5px;
 		list-style: none;
 		box-sizing: border-box;
@@ -153,58 +176,43 @@
 		background-color: black;
 	}
 
-/*	.valueblock {
-		margin-left: 8px;
-		margin-top: 5px;
-		margin-bottom: 5px;
+	.objectblock-inner {
+		margin: 0;
+		padding: 0;
+		list-style: none;
 	}
 
-	.valueblock-label {
-		border-right: 1px solid black;
-		background-color: #E0E0E0;
+	.line-thing {
 		display: inline-block;
-		padding: 4px;
-	}
-
-	.valueblock-value {
-		font-style: italic;
-		display: inline-block;
-		padding: 4px;
-		padding-left: 4px;
-		padding-right: 4px;
-	}
-
-	.valueblock {
-		border: 1px solid black;
-		border-right: 5px solid green;
-		border-radius: 2px;
-		display: inline-block;
-		background-color: #FAFAFA;
-	}
-
-	.valueblock-container::before {
-		display: block;
-		content: "";
-		position: relative;
-		width: 5px;
+		vertical-align: middle;
+		width: 8px;
 		height: 1px;
-		margin-top:auto;
-		margin-bottom:auto;
+		border: none;
 		background-color: black;
 	}
 
-	.valueblock-container:hover {
-		background-color: rgba(0, 0, 0, 0.1);
+	.line-thing-inner {
+		width: 5px;
+		height: 5px;
+		background-color: white;
+		margin-left: -3px;
+		border:1px solid black;
+		box-sizing: border-box;
 	}
-
-	.valueblock-container:hover .valueblock {
-		background-color: lightyellow;
-	}
-*/
+/*
+	.line-thing::before {
+		left: -2px;
+		top: -50%;
+		width: 4px;
+		height: 4px;
+		content: "";
+		display: block;
+		position: relative;
+		background-color: black;
+	}*/
 
 	.title {
-		margin-left: 8px;
-		margin-top: 12px;
+		padding-top: 12px;
 		margin-bottom: 0px;
 		transition: background-color 0.1s;
 		list-style: none;
@@ -218,4 +226,18 @@
 		display: inline-block;
 		background-color: #FAFAFA;
 	}
+
+	.hidden-block {
+		margin-left: 20px;
+		padding-top: 5px;
+		padding-bottom: 5px;
+	}
+
+	.hidden-block span {
+		padding: 2px 5px 2px 5px;
+		border-radius: 3px;
+		background-color: #00000022;
+		user-select: none;
+	}
+
 </style>

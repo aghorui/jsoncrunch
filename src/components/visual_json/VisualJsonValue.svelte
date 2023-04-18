@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { JsonTypeNames } from "../lib/Types";
-    import { copyText, hasWhiteSpace, isInteger } from "../lib/Util";
+    import { JsonTypeNames } from "../../lib/Types";
+    import { copyText, hasWhiteSpace, isInteger } from "../../lib/Util";
 	export let key: string = "";
 	export let value: string|null = "";
 	export let displayValue: boolean = true;
@@ -67,9 +67,9 @@
 	}
 
 	.valueblock-container {
-		margin-left: 8px;
-		margin-top: 5px;
-		margin-bottom: 5px;
+		padding-left: 8px;
+		padding-top: 5px;
+		padding-bottom: 5px;
 	}
 
 	.valueblock-value {

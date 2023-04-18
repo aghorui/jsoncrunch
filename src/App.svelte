@@ -2,96 +2,94 @@
 	import AboutPopup from './components/AboutPopup.svelte';
 	import MenuBar from './components/MenuBar.svelte';
 	import Notification from './components/Notification.svelte';
-	import PropertiesView from './components/PropertiesView.svelte';
-	import ContextMenu from './components/ContextMenu.svelte';
-	import VisualJsonDocument from './components/VisualJsonDocument.svelte';
-	import { contextMenuTargetSet, currentView, pageTitle } from './lib/State';
-	import { JsonType, ViewportViewType, type ContextMenuEvent } from './lib/Types';
-    import TextView from './components/TextView.svelte';
-    import ToggleSelector from './components/ToggleSelector.svelte';
+	import PropertiesView from './components/sidebar/PropertiesView.svelte';
+	import ContextMenu from './components/visual_json/ContextMenu.svelte';
+	import VisualJsonDocument from './components/visual_json/VisualJsonDocument.svelte';
+	import { aboutPopupShown, contextMenuTargetSet, currentView, pageTitle, textInputError } from './lib/State';
+	import { ViewportViewType, type ToggleSelectorOptions } from './lib/Types';
+	import TextView from './components/text/TextView.svelte';
+	import ToggleSelector from './components/ToggleSelector.svelte';
 
-	let sampleData: object = {"widget": {
-    "debug": "on",
-    "window": {
-        "title": "Sample Konfabulator Widget",
-        "name": "main_window",
-        "width": 500,
-        "height": 500
-    },
-    "ima ge": {
-        "src": "Images/Sun.png",
-        "name": "sun1",
-        "hOffset": 250,
-        "vOff set": 250,
-        "alignment": "center"
-    },
-    "text": {
-        "data": "Click Here",
-        "size": 36,
-        "style": "bold",
-        "name": "text1",
-        "hOffset": 250,
-        "vOffset": 100,
-        "alignment": "center",
-        "onMouseUp": "sun1.opacity = (sun1.opacity / 100) * 90;"
-    }
-}};
+	let sampleData: object =
+	{
+		"widget": {
+		"debug": "on",
+		"window": {
+			"title": "Sample Konfabulator Widget",
+			"name": "main_window",
+			"width": 500,
+			"height": 500
+		},
+		"ima ge": {
+			"src": "Images/Sun.png",
+			"name": "sun1",
+			"hOffset": 250,
+			"vOff set": 250,
+			"alignment": "center"
+		},
+		"text": {
+			"data": "Click Here",
+			"size": 36,
+			"style": "bold",
+			"name": "text1",
+			"hOffset": 250,
+			"vOffset": 100,
+			"alignment": "center",
+			"onMouseUp": "sun1.opacity = (sun1.opacity / 100) * 90;"
+		}
+	}};
 
-	let textInputJson: string = JSON.stringify(sampleData, null, 4)
+	let toggleOptionVisual: ToggleSelectorOptions =
+		{ key: "Visual",   value: ViewportViewType.VISUAL,   enabled: true  };
+	let toggleOptionSource: ToggleSelectorOptions =
+		{ key: "Source",   value: ViewportViewType.SOURCE,   enabled: true  };
+	let toggleOptionMetadict: ToggleSelectorOptions =
+		{ key: "Metadict", value: ViewportViewType.METADICT, enabled: true  };
 
-	let contextMenuFocused: boolean = false;
-	let contextMenuShown: boolean = false;
-	let contextMenuX: number = 0;
-	let contextMenuY: number = 0;
-	let contextMenuTarget: any = null;
-	let contextMenuTargetPath: string = "(no path)";
-	let contextMenuTargetType: JsonType = JsonType.INVALID;
-	let contextMenuDelete: () => void = null;
-	let contextMenuTogglePin: () => void = null;
+	let toggleOptions: Array<ToggleSelectorOptions> = [
+		toggleOptionVisual,
+		toggleOptionSource,
+		toggleOptionMetadict
+	];
+
+	let textInputJson: string = JSON.stringify(sampleData, null, 4);
 
 	let notificationShown:boolean = false;
 	let notificationText = "";
 
 	function showContextMenu(e) {
-		contextMenuShown = true;
-		contextMenuX = e.detail.x;
-		contextMenuY = e.detail.y;
-		contextMenuTarget = e.detail.target;
-		contextMenuTargetPath = e.detail.path;
-		contextMenuTargetType = e.detail.type;
-		contextMenuTogglePin = e.detail.togglePin;
-		contextMenuDelete = e.detail.deleteObject;
-		contextMenuFocused = true;
-		console.log(e, contextMenuX, contextMenuY);
-
 		if (!e.detail.isMultiselect) {
-			$contextMenuTargetSet.clear()
+			$contextMenuTargetSet.clear();
 		}
 
 		$contextMenuTargetSet.set(e.detail.path, e.detail);
-		$contextMenuTargetSet = $contextMenuTargetSet
+		$contextMenuTargetSet = $contextMenuTargetSet;
 
-		console.log("thing: ", contextMenuTargetSet)
+		console.log("thing: ", contextMenuTargetSet);
 	}
 
 	function clearContextMenu(e) {
-		contextMenuShown = false;
 		$contextMenuTargetSet.clear();
-		$contextMenuTargetSet = $contextMenuTargetSet
+		$contextMenuTargetSet = $contextMenuTargetSet;
 	}
 
 	function contextMenuRemoveElement(e) {
-		console.log("removing ", e.detail.key)
-		$contextMenuTargetSet.delete(e.detail.key)
-		$contextMenuTargetSet = $contextMenuTargetSet
+		console.log("removing ", e.detail.key);
+		$contextMenuTargetSet.delete(e.detail.key);
+		$contextMenuTargetSet = $contextMenuTargetSet;
 	}
 
 	$: try {
-		sampleData = JSON.parse(textInputJson)
+		sampleData = JSON.parse(textInputJson);
+		$textInputError = "";
+		toggleOptionMetadict.enabled = true;
+		toggleOptionVisual.enabled = true;
+		toggleOptions = toggleOptions;
 	} catch (e) {
-		console.log(e);
-		notificationShown = true;
-		notificationText = e.toString();
+		$textInputError = e.message
+		toggleOptionMetadict.enabled = false;
+		toggleOptionVisual.enabled = false;
+		toggleOptions = toggleOptions;
 	}
 </script>
 
@@ -100,57 +98,42 @@
 </svelte:head>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<main on:click={() => { if (!contextMenuFocused) { contextMenuShown = false; } }}>
+<main>
 	<div class="notification-container">
 		<Notification bind:shown={notificationShown} bind:text={notificationText} />
 	</div>
 
-<!-- <AboutPopup /> -->
+<AboutPopup shown={$aboutPopupShown} />
 
 <div style="display: flex; flex-direction: column; flex-shrink: 0; max-height: 100vh; height: 100vh;">
 	<MenuBar />
 	<div style="display: flex; flex-direction: row; flex: 1;">
-		<div style="flex: 1; display: flex; flex-direction: column; max-height: calc(100vh - 32px);">
+		<div style="flex: 1 0 1px; overflow: auto; display: flex; flex-direction: column; max-height: calc(100vh - 32px);">
 
 			<div style="display: flex; flex-direction: row; border-bottom: 1px solid black;">
 				<ContextMenu
-					bind:contextMenuFocused={contextMenuFocused}
-					bind:targetSet={$contextMenuTargetSet}
-					target={contextMenuTarget}
-					path={contextMenuTargetPath}
-					targetType={contextMenuTargetType}
-					togglePin={contextMenuTogglePin}
-					deleteObject={contextMenuDelete}
-					x={contextMenuX}
-					y={contextMenuY} />
+					bind:targetSet={$contextMenuTargetSet}/>
 				<ToggleSelector
-					options={
-						[
-							{ key: "Visual",   value: ViewportViewType.VISUAL,   enabled: true},
-							{ key: "Source",   value: ViewportViewType.SOURCE,   enabled: true},
-							{ key: "Metadict", value: ViewportViewType.METADICT, enabled: false}
-						]
-					}
+					options={toggleOptions}
 					currentSelected={currentView} />
 			</div>
 
-			{#if $currentView === ViewportViewType.VISUAL}
-				<VisualJsonDocument
-					on:contextEvent={showContextMenu}
-					on:removeContextEvent={contextMenuRemoveElement}
-					targetDocument={sampleData}
-					targetDocumentName={"sampleData"}/>
+			<VisualJsonDocument
+				on:contextEvent={showContextMenu}
+				on:removeContextEvent={contextMenuRemoveElement}
+				targetDocument={sampleData}
+				targetDocumentName={"sampleData"}
+				shown={$currentView === ViewportViewType.VISUAL} />
 
-			{:else if $currentView === ViewportViewType.SOURCE}
-				<TextView bind:code={textInputJson} />
+			<TextView
+				bind:code={textInputJson}
+				bind:errorMessage={$textInputError}
+				shown={$currentView === ViewportViewType.SOURCE} />
 
-			{:else if $currentView === ViewportViewType.METADICT}
-				<TextView code={JSON.stringify(sampleData, null, 4)} />
+			<TextView
+				code={JSON.stringify(sampleData, null, 4)}
+				shown={$currentView === ViewportViewType.METADICT} />
 
-			{:else}
-				<p>Congratulations! You've found a bug!</p>
-
-			{/if}
 		</div>
 
 		<PropertiesView />

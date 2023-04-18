@@ -1,11 +1,12 @@
 <script lang="ts">
     import { onMount } from "svelte";
-	import App from "../App.svelte";
-    import { pageTitle } from "../lib/State";
+	import App from "../../App.svelte";
+    import { pageTitle } from "../../lib/State";
 	import VisualJsonObject from "./VisualJsonObject.svelte";
 
 	export let targetDocumentName: string = "";
 	export let targetDocument: object | [any] = {};
+	export let shown: boolean = false;
 
 	onMount(() => {
 		$pageTitle = targetDocumentName + " - JsonTx";
@@ -15,7 +16,7 @@
 	$: $pageTitle = targetDocumentName + " - JsonTx";
 </script>
 
-<div class="jsondocument">
+<div class="jsondocument" style:display={shown ? "flex" : "none"}>
 	<h2>{targetDocumentName}</h2>
 
 	<div class="jsondocument-body">
@@ -26,7 +27,7 @@
 				on:clearContextEvent
 				title={"root"}
 				targetObject={targetDocument}
-				parentPath={""} />
+				parentPathString={""} />
 		</ul>
 	</div>
 </div>
@@ -36,9 +37,11 @@
 		font-size: 10px;
 		padding: 5px;
 		font-family: monospace;
-		overflow: auto;
+		overflow-x: auto;
+		overflow-y: auto;
 		white-space: nowrap;
-		flex: 1;
+		flex: 1 0 1px;
+		flex-direction: column;
 		box-shadow: 0px 5px 5px -4px rgba(0,0,0,0.4) inset;
 	}
 

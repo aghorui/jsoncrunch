@@ -1,11 +1,12 @@
 <script lang="ts">
-	import VisualJsonObject from "./VisualJsonObject.svelte";
+	import VisualJsonObject from "./visual_json/VisualJsonObject.svelte";
 	export let targetDocumentName: string = "";
 	export let targetDocument: object | [any] = {};
 
 </script>
 
 <div class="jsondocument">
+
 	<h2>{targetDocumentName}</h2>
 
 	<div class="jsondocument-body">
@@ -13,9 +14,11 @@
 			<VisualJsonObject title={"root"} targetObject={targetDocument} />
 		</ul>
 	</div>
+
 </div>
 
 <style>
+
 	.jsondocument {
 		font-size: 10px;
 		margin: 5px;
@@ -33,4 +36,5 @@
 		box-sizing: border-box;
 		transition: background-color 0.1s;
 	}
+
 </style>
