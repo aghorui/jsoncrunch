@@ -1,9 +1,10 @@
 <script lang="ts">
-    import { createEventDispatcher, onDestroy, onMount } from "svelte";
+	import { createEventDispatcher, onDestroy, onMount } from "svelte";
 	import { getJsonType, JsonType, type ContextMenuEvent, type JsonPath } from "../../lib/Types";
 	import { copyText, hasWhiteSpace, isInteger, getIndexRepresentation } from "../../lib/Util";
 	import VisualJsonValue from "./VisualJsonValue.svelte";
-    import { contextMenuTargetSet } from "../../lib/State";
+	import { contextMenuTargetSet } from "../../lib/State";
+	import VisualJsonEntryMenu from "./VisualJsonEntryMenu.svelte";
 
 	const dispatch = createEventDispatcher()
 
@@ -86,23 +87,10 @@
 	</div>
 
 	{#if isHighlighted}
-		<div style:display="inline-block" style:flex="1" style:padding-left="5px">
-			<!-- <button type="button" on:click={() => {persistentHighlight = !persistentHighlight}}>
-				{#if persistentHighlight}Unpin{:else}Pin{/if}
-			</button> -->
-
-			<button on:click|stopPropagation type="button">Info</button>
-
-			<!-- <button type="button" disabled={deleteObject === null} on:click|stopPropagation={() => {if (deleteObject) deleteObject()}}>Delete</button> -->
-
-			<!-- <button type="button">Delete</button>-->
-
-			<button type="button" on:click|stopPropagation={() => { copyText(currentPathString) }}>Copy Path</button>
-
-			<button type="button" on:click|stopPropagation={() => { copyText(JSON.stringify(targetObject, null, 4)) }}>Copy JSON</button>
-
-			<div class="path" on:click|stopPropagation style:display="inline-block">{currentPathString} : <i>Object</i></div>
-		</div>
+		<VisualJsonEntryMenu
+			targetObjectType={JsonType.OBJECT}
+			currentPathString={currentPathString}
+			targetObject={targetObject} />
 	{/if}
 </div>
 
@@ -150,10 +138,6 @@
 {/if}
 
 <style>
-
-	button {
-		font-size: 10px;
-	}
 
 	.objectblock {
 		margin-left: 20px;

@@ -1,4 +1,4 @@
-import type { getJsonType, JsonPath, JsonType, JsonValue } from "./Types";
+import { getJsonType, isObjectOrArray, JsonType, type IndexEntry, type JsonPath, type JsonValue } from "./Types";
 
 /**
  * Copies text to clipboard.
@@ -13,7 +13,7 @@ export function copyText(text: string) {
 	navigator.clipboard.writeText(text).then(
 		() => {  },
 		(err) => { console.log(err); }
-	)
+	);
 }
 
 /**
@@ -89,9 +89,16 @@ export function getObjectElement(k: object, path: JsonPath): object | undefined 
  * @return     {number}           The weight.
  */
 export function weight(value: JsonValue): number {
-	return JSON.stringify(value).length
+	return JSON.stringify(value).length;
 }
 
+
+/**
+ * Creates and fills an array with a default value
+ */
+export function makeArray<T>(length: number, value: T): Array<T> {
+	return Array(length).fill(value);
+}
 
 /**
  * Gets the internal schema representation (not json schema) of a JSON object.
@@ -111,3 +118,87 @@ export function weight(value: JsonValue): number {
 	}
 }
 */
+
+/*/**
+ * Iterates an object in level order.
+ *
+ * @param      {object}            doc     The document
+ * @return     {Iterator<object>}  { description_of_the_return_value }
+
+export function iterateObject(doc: object): Iterator<object> {
+	return {
+		next: () => {
+			return
+		}
+	}
+}*/
+
+/**
+ * Walks the entire JSON tree and builds an index for all the objects on the
+ * tree.
+ *
+ * @param      {object}             doc     The document.
+ * @return     {Array<IndexEntry>}          The index.
+ */
+export function buildIndex(doc: object): Array<IndexEntry> {
+
+	// pointer to current node
+	let stack: Array<object> = [ doc ];
+
+	// pointer to current node's Object.keys array index. By default it is zero.
+	let keyIndexStack: Array<number> = [ 0 ];
+
+	// path to current node
+	// main reason for not creating a struct stack because we'll concatenate
+	// this everytime we have a new object.
+	let pathStack: Array<string> = [ "root" ];
+
+	let indexList: Array<IndexEntry> = [];
+
+	let restart: boolean = false;
+
+	while (stack.length > 0) {
+		// Define convenience variables.
+		// We will iterate in the order defined by Object.keys.
+		let top = stack.length - 1
+		let stacktop = stack[top]
+		let topkeys = Object.keys(stack[top])
+
+		for (let i = keyIndexStack[top]; i < topkeys.length; i++) {
+
+			// Increment the key index.
+			keyIndexStack[top] = i + 1;
+
+			// Add whatever there is to the list.
+			indexList.push({
+				path: [...pathStack, topkeys[i]].join("/"),
+				data: stacktop[topkeys[i]],
+				key: topkeys[i],
+				type: getJsonType(stacktop[topkeys[i]])
+			})
+
+			// If its traversable, traverse it.
+			if (isObjectOrArray(stacktop[topkeys[i]])) {
+				stack.push(stacktop[topkeys[i]]);
+				pathStack.push(topkeys[i]);
+				keyIndexStack.push(0);
+				restart = true;
+				break;
+			}
+		}
+
+		// this flag is set to true if we want to go up one level in the stack.
+		if (restart === true) {
+			restart = false;
+			continue;
+		}
+
+		// If object is exhausted. Pop the top.
+		stack.pop()
+		keyIndexStack.pop()
+		pathStack.pop()
+	}
+
+	// Sort and return
+	return indexList.sort((a, b) => { return a.path.localeCompare(b.path) })
+}

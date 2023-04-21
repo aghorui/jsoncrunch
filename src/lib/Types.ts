@@ -33,6 +33,8 @@ export type ToggleSelectorOptions = { key: string, value: any, enabled: boolean 
 
 export type Operation = { name: string, params?: any }
 
+export type IndexEntry = { path: string, data: object, key: string, type: JsonType }
+
 
 /**
  * Describes the current view in the main viewport.
@@ -168,6 +170,18 @@ export type ContextMenuEvent = {
 		return getObjectElement(k, path);
 	}
 }*/
+
+/**
+ * Determines whether the specified value is an object or array. (Basically an
+ * object in either case but explicitly marked so to avoid future screw ups.)
+ *
+ * @param      {any}      value   The value
+ * @return     {boolean}  True if the specified value is object and not array, False otherwise.
+ */
+export function isObjectOrArray(value: any): boolean {
+	return typeof value === 'object' && value !== null;
+}
+
 
 /**
  * Determines whether the specified value is object and not array.

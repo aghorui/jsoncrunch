@@ -5,39 +5,53 @@
 	import PropertiesView from './components/sidebar/PropertiesView.svelte';
 	import ContextMenu from './components/visual_json/ContextMenu.svelte';
 	import VisualJsonDocument from './components/visual_json/VisualJsonDocument.svelte';
-	import { aboutPopupShown, contextMenuTargetSet, currentView, pageTitle, textInputError } from './lib/State';
+	import { aboutPopupShown, contextMenuTargetSet, currentView, filterText, pageTitle, settingsPopupShown, textInputError } from './lib/State';
 	import { ViewportViewType, type ToggleSelectorOptions } from './lib/Types';
 	import TextView from './components/text/TextView.svelte';
 	import ToggleSelector from './components/ToggleSelector.svelte';
+	import { buildIndex, type IndexEntry } from './lib/Util';
+    import SettingsPopup from './components/SettingsPopup.svelte';
+
+	let index: Array<IndexEntry> = null
 
 	let sampleData: object =
 	{
 		"widget": {
-		"debug": "on",
-		"window": {
-			"title": "Sample Konfabulator Widget",
-			"name": "main_window",
-			"width": 500,
-			"height": 500
-		},
-		"ima ge": {
-			"src": "Images/Sun.png",
-			"name": "sun1",
-			"hOffset": 250,
-			"vOff set": 250,
-			"alignment": "center"
-		},
-		"text": {
-			"data": "Click Here",
-			"size": 36,
-			"style": "bold",
-			"name": "text1",
-			"hOffset": 250,
-			"vOffset": 100,
-			"alignment": "center",
-			"onMouseUp": "sun1.opacity = (sun1.opacity / 100) * 90;"
+			"debug": "on",
+			"window": {
+				"title": "Sample Konfabulator Widget",
+				"name": "main_window",
+				"width": 500,
+				"height": 500
+			},
+			"ima ge": {
+				"src": "Images/Sun.png",
+				"name": "sun1",
+				"hOffset": 250,
+				"vOff set": 250,
+				"alignment": "center"
+			},
+			"text": {
+				"data": "Click Here",
+				"size": 36,
+				"style": "bold",
+				"name": "text1",
+				"hOffset": 250,
+				"vOffset": 100,
+				"alignment": "center",
+				"onMouseUp": "sun1.opacity = (sun1.opacity / 100) * 90;"
+			}
 		}
-	}};
+	};
+
+	$: {
+		index = buildIndex(sampleData)
+		console.log(index)
+		console.log(index.filter((k) => k.key.includes("e")))
+	}
+
+
+	let finalData: object = sampleData
 
 	let toggleOptionVisual: ToggleSelectorOptions =
 		{ key: "Visual",   value: ViewportViewType.VISUAL,   enabled: true  };
@@ -99,11 +113,13 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <main>
-	<div class="notification-container">
-		<Notification bind:shown={notificationShown} bind:text={notificationText} />
-	</div>
 
-<AboutPopup shown={$aboutPopupShown} />
+<div class="notification-container">
+	<Notification bind:shown={notificationShown} bind:text={notificationText} />
+</div>
+
+<AboutPopup bind:shown={$aboutPopupShown} />
+<SettingsPopup bind:shown={$settingsPopupShown} />
 
 <div style="display: flex; flex-direction: column; flex-shrink: 0; max-height: 100vh; height: 100vh;">
 	<MenuBar />
@@ -121,7 +137,7 @@
 			<VisualJsonDocument
 				on:contextEvent={showContextMenu}
 				on:removeContextEvent={contextMenuRemoveElement}
-				targetDocument={sampleData}
+				targetDocument={finalData}
 				targetDocumentName={"sampleData"}
 				shown={$currentView === ViewportViewType.VISUAL} />
 

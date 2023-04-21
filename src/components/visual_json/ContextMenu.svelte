@@ -37,7 +37,7 @@
  -->
 	<button type="button">Info</button>
 
-	{#if targetSet.size == 1}
+	{#if targetSet.size === 1}
 		<button type="button" disabled={target.deleteObject === null}>Subtree</button>
 
 		<button type="button" on:click={target.deleteObject} disabled={target.deleteObject === null}>Delete</button>
@@ -47,8 +47,8 @@
 		<button type="button" on:click={() => { copyText(target.key) }}>Copy Key</button>
 
 		<button type="button" on:click={() => { copyText(JSON.stringify(target.value)) }}>Copy Value</button>
-	{:else}
-		<button type="button" on:click={target.deleteObject} disabled={target.deleteObject === null}>Delete All</button>
+	{:else if targetSet.size > 1}
+		<button type="button" on:click={target.deleteObject} disabled={true}>Delete All</button>
 
 		<button type="button" on:click={() => { copyText(target.path) }}>Copy Paths</button>
 

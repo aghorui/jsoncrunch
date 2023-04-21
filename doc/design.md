@@ -57,3 +57,4 @@ follows:
 * Possible foresight: Maybe add the count to `JSONSelectionNode` so its easier
   to recursively determine the count?
 
+* TODO, None of the above stuff is being used right now

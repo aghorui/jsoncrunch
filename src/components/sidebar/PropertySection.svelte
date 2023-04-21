@@ -28,6 +28,7 @@
 		flex-direction: column;
 		min-width: 20%;
 		background-color: #444444;
+		word-wrap: break-word;
 	}
 
 	.title-container {

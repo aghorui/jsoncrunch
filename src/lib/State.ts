@@ -11,4 +11,8 @@ export let contextMenuTargetSet: Writable<Map<string, ContextMenuEvent>> = writa
 
 export let aboutPopupShown: Writable<boolean> = writable(false)
 
+export let settingsPopupShown: Writable<boolean> = writable(false)
+
 export let textInputError: Writable<string> = writable("")
+
+export let filterText: Writable<string> = writable("")

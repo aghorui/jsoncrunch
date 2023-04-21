@@ -1,15 +1,13 @@
 <script lang="ts">
 	import AppInfo from "../lib/AppInfo";
+	import { aboutPopupShown, settingsPopupShown } from "../lib/State";
 </script>
 
 <div class="menubar">
-<div class="item">JsonTx {AppInfo.appVersion}</div>
-
+<item class="title" disabled={true}>JsonTx {AppInfo.appVersion}</item>
 <div class="spacer"></div>
-
-
-<div class="item">About</div>
-<div class="item">Settings</div>
+<button on:click={() => { $aboutPopupShown = true; }} class="item">About</button>
+<button on:click={() => { $settingsPopupShown = true; }} class="item">Settings</button>
 </div>
 
 <style>
@@ -17,18 +15,32 @@
 		background-color: black;
 		color: white;
 		display: block;
-		height: 24px;
+		height: 30px;
 		display: flex;
 		align-items: center;
 		align-content: center;
-		padding: 3px;
 	}
+
+	.title {
+		flex-shrink: 0;
+		font-weight: bold;
+		margin-left: 5px;
+		color: white;
+	}
+
 
 	.item {
 		flex-shrink: 0;
 		font-weight: bold;
-		margin-left: 5px;
-		margin-right: 5px;
+		background: none;
+		border: none;
+		color: white;
+		border-radius: 0;
+		height: 100%;
+	}
+
+	.item:hover {
+		background-color: #555555;
 	}
 
 	.spacer {
