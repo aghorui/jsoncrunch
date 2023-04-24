@@ -3,7 +3,9 @@
 	export let onclick: () => void = null;
 </script>
 
-<input type="button" class="button" value={label} on:click={onclick}/>
+<button type="button" class="button" on:click={onclick}>
+{label}
+</button>
 
 <style>
 	.button {

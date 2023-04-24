@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { filterText, overlayCursorStyle, overlayShown } from "../../lib/State";
+	import { filterText, initialDocument, finalDocument, overlayCursorStyle, overlayShown, filterMode } from "../../lib/State";
+    import { buildIndex } from "../../lib/Util";
 	import PropertyButton from "./PropertyButton.svelte";
 	import PropertyLabel from "./PropertyLabel.svelte";
 	import PropertySection from "./PropertySection.svelte";
@@ -56,7 +57,12 @@
 				{ key: "Select Three",   value: 3,   enabled: true  }
 			]} />
 
-			<PropertyButton label="search query"/>
+			<PropertyButton label="search query" onclick={() => {
+				let index = buildIndex($initialDocument)
+				console.log($filterText)
+				$finalDocument = index.filter((k) => k.key.includes($filterText))
+				$filterMode = true;
+			 }}/>
 			<PropertyButton label="reset"/>
 		</PropertySection>
 		<PropertySection title={"History"}>

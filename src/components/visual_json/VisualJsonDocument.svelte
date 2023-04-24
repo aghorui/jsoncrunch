@@ -1,11 +1,14 @@
 <script lang="ts">
-    import { onMount } from "svelte";
+	import { onMount } from "svelte";
 	import App from "../../App.svelte";
-    import { pageTitle } from "../../lib/State";
+	import { pageTitle } from "../../lib/State";
 	import VisualJsonObject from "./VisualJsonObject.svelte";
+    import FilterTable from "../filter_table/FilterTable.svelte";
+    import type { IndexEntry } from "../../lib/Types";
 
 	export let targetDocumentName: string = "";
-	export let targetDocument: object | [any] = {};
+	export let targetDocument: object | Array<any> = {};
+	export let filterMode: boolean = false
 	export let shown: boolean = false;
 
 	onMount(() => {
@@ -14,10 +17,14 @@
 
 
 	$: $pageTitle = targetDocumentName + " - JsonTx";
+
+	$: thing = targetDocument as Array<IndexEntry>
 </script>
 
+{#if !filterMode}
+
 <div class="jsondocument" style:display={shown ? "flex" : "none"}>
-	<h2>{targetDocumentName}</h2>
+	<slot />
 
 	<div class="jsondocument-body">
 		<ul class="objectwrapper">
@@ -31,6 +38,12 @@
 		</ul>
 	</div>
 </div>
+
+{:else}
+
+<FilterTable filterList={thing} />
+
+{/if}
 
 <style>
 	.jsondocument {

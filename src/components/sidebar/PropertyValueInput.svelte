@@ -4,7 +4,7 @@
 	export let readonly: boolean = false;
 </script>
 
-<input type="text" class="value-input" value={value} placeholder={placeholder} readonly={readonly}/>
+<input type="text" class="value-input" bind:value={value} placeholder={placeholder} readonly={readonly}/>
 
 <style>
 	.value-input {

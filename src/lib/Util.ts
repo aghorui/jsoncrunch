@@ -67,11 +67,10 @@ export function isInteger(s: string): boolean {
  * @return     {string}  The representation.
  */
 export function getIndexRepresentation(s: string, parentPath: string): string {
-	// objects can also have empty strings as keys
-	if (keyRequiresQuotes(s)) {
-		return `['${s}']`;
-	} else if (isInteger(s)) {
+	if (isInteger(s)) {
 		return `[${s}]`;
+	} else if (keyRequiresQuotes(s)) {
+		return `['${s}']`;
 	} else if (parentPath === "") {
 		return s;
 	} else {
@@ -218,5 +217,3 @@ export function buildIndex(doc: object): Array<IndexEntry> {
 	// Sort and return
 	return indexList.sort((a, b) => { return a.path.localeCompare(b.path) })
 }
-
-export { IndexEntry };

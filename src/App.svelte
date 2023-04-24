@@ -28,13 +28,14 @@
 	import PropertiesView from './components/sidebar/PropertiesView.svelte';
 	import ContextMenu from './components/visual_json/ContextMenu.svelte';
 	import VisualJsonDocument from './components/visual_json/VisualJsonDocument.svelte';
-	import { aboutPopupShown, contextMenuTargetSet, currentView, filterText, overlayCursorStyle, overlayShown, pageTitle, settingsPopupShown, textInputError } from './lib/State';
-	import { ViewportViewType, type ToggleSelectorOptions } from './lib/Types';
+	import { aboutPopupShown, contextMenuTargetSet, currentView, filterMode, filterText, finalDocument, initialDocument, overlayCursorStyle, overlayShown, pageTitle, settingsPopupShown, textInputError } from './lib/State';
+	import { ViewportViewType, type ToggleSelectorOptions, type IndexEntry } from './lib/Types';
 	import TextView from './components/text/TextView.svelte';
 	import ToggleSelector from './components/ToggleSelector.svelte';
-	import { buildIndex, type IndexEntry } from './lib/Util';
+	import { buildIndex } from './lib/Util';
 	import SettingsPopup from './components/SettingsPopup.svelte';
-    import Overlay from './components/Overlay.svelte';
+	import Overlay from './components/Overlay.svelte';
+    import FilterTable from './components/filter_table/FilterTable.svelte';
 
 	let index: Array<IndexEntry> = null
 
@@ -68,14 +69,15 @@
 		}
 	};
 
-	let finalData: object = sampleData
+	$initialDocument = sampleData;
+	$finalDocument = $initialDocument;
 
-	$: {
+	/*$: {
 		index = buildIndex(sampleData)
 		console.log(index)
 		console.log(index.filter((k) => k.key.includes("e")))
-		finalData = index.filter((k) => k.key.includes("e"))
-	}
+		finalData2 = index.filter((k) => k.key.includes("e"))
+	}*/
 
 	let toggleOptionVisual: ToggleSelectorOptions =
 		{ key: "Visual",   value: ViewportViewType.VISUAL,   enabled: true  };
@@ -102,8 +104,6 @@
 
 		$contextMenuTargetSet.set(e.detail.path, e.detail);
 		$contextMenuTargetSet = $contextMenuTargetSet;
-
-		console.log("thing: ", contextMenuTargetSet);
 	}
 
 	function clearContextMenu(e) {
@@ -112,13 +112,11 @@
 	}
 
 	function contextMenuRemoveElement(e) {
-		console.log("removing ", e.detail.key);
 		$contextMenuTargetSet.delete(e.detail.key);
 		$contextMenuTargetSet = $contextMenuTargetSet;
 	}
 
 	$: try {
-		console.log("Text Input Json Update")
 		sampleData = JSON.parse(textInputJson);
 		$textInputError = "";
 		toggleOptionMetadict.enabled = true;
@@ -165,9 +163,11 @@
 			<VisualJsonDocument
 				on:contextEvent={showContextMenu}
 				on:removeContextEvent={contextMenuRemoveElement}
-				targetDocument={finalData}
+				filterMode={$filterMode}
+				targetDocument={$finalDocument}
 				targetDocumentName={"sampleData"}
-				shown={$currentView === ViewportViewType.VISUAL} />
+				shown={$currentView === ViewportViewType.VISUAL}>
+			</VisualJsonDocument>
 
 			<TextView
 				bind:code={textInputJson}
