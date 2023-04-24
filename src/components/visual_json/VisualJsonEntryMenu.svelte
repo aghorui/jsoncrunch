@@ -2,7 +2,7 @@
     import { JsonType, JsonTypeNames } from "../../lib/Types";
 	import { copyText } from "../../lib/Util";
 	export let targetObjectType: JsonType = JsonType.INVALID;
-	export let currentPathString: string = "";
+	export let currentPathString: string = "(no path)";
 	export let targetObject: object = null;
 
 </script>
@@ -26,18 +26,27 @@
 
 	<button type="button"
 		on:click|stopPropagation={() => { copyText(JSON.stringify(targetObject, null, 4)) }}>
-		Copy JSON
+		Copy Value
 	</button>
 
-	<div on:click|stopPropagation on:keypress|stopPropagation  style:display="inline-block">
+	<slot />
+
+	<div class="path-display">
 		{currentPathString} : <i>{JsonTypeNames[targetObjectType]}</i>
 	</div>
 </div>
 
 <style>
 	button {
-		font-size: 10px;
+		font-family: monospace;
+		font-size: 9px;
 	}
+
+	.path-display {
+		display: inline-block;
+		user-select: none;
+	}
+
 	.entry-menu {
 		display: inline-block;
 		flex: 1;

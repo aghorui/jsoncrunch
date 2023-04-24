@@ -1,4 +1,4 @@
-import { getJsonType, isObjectOrArray, JsonType, type IndexEntry, type JsonPath, type JsonValue } from "./Types";
+import { getJsonType, isObjectOrArray, JsonType, type IndexEntry, type JsonPath, type JsonPathIndex, type JsonValue } from "./Types";
 
 /**
  * Copies text to clipboard.
@@ -33,6 +33,22 @@ export function hasWhiteSpace(s: string): boolean {
 	return /\s/g.test(s);
 }
 
+
+/**
+ * Determines if a key contains special characters that make it so that the
+ * member can no longer be accessed by the member access operator (".") and
+ * we will have to use subscripts ("['xyz']") instead.
+ *
+ * @param      {string}   s       { parameter_description }
+ * @return     {boolean}  { description_of_the_return_value }
+ */
+export function keyRequiresQuotes(s: string): boolean {
+	return s === "" || // empty strings are valid keys.
+		   /\s/g.test(s) ||
+		   /^[0-9]/.test(s) ||
+		   /[\~\!\@\#\%\^\&\*\(\)\+\`\{\}\[\]\:\;\"\'\<\>\,\.\?\|\/]/.test(s);
+}
+
 /**
  * Determines whether the specified s is integer.
  *
@@ -52,7 +68,7 @@ export function isInteger(s: string): boolean {
  */
 export function getIndexRepresentation(s: string, parentPath: string): string {
 	// objects can also have empty strings as keys
-	if (s === "" || hasWhiteSpace(s)) {
+	if (keyRequiresQuotes(s)) {
 		return `['${s}']`;
 	} else if (isInteger(s)) {
 		return `[${s}]`;
@@ -202,3 +218,5 @@ export function buildIndex(doc: object): Array<IndexEntry> {
 	// Sort and return
 	return indexList.sort((a, b) => { return a.path.localeCompare(b.path) })
 }
+
+export { IndexEntry };

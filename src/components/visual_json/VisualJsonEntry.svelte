@@ -1,15 +1,25 @@
 <script lang="ts">
+	import { contextMenuTargetSet } from "../../lib/State";
 	import { JsonType } from "../../lib/Types";
 	import VisualJsonEntryMenu from "./VisualJsonEntryMenu.svelte";
 
-	let contextMenuAddElement
-	let contextMenuRemoveElement
-	let isHighlighted = false;
-	let persistentHighlight = false;
-	let titleBackgroundColor;
+	export let titleBackgroundColor: string = "";
 	export let targetObjectType: JsonType = JsonType.INVALID;
-	export let currentPathString: string = "";
-	export let targetObject: object = null;
+	export let targetObject: object | [any] = {};
+	export let isHighlighted: boolean = false;
+	export let currentPathString: string = "(no path)";
+	export let contextMenuAddElement: (Event) => void = null
+	export let contextMenuRemoveElement: (Event) => void = null
+
+	let persistentHighlight: boolean = false;
+
+	$: backgroundColor = isHighlighted || persistentHighlight ? "rgba(0, 0, 0, 0.05)" : "unset";
+	$: titleBackgroundColor = persistentHighlight ? "rgba(0, 0, 0, 0.4)" :
+							  (isHighlighted ? "rgba(0, 0, 0, 0.2)" :
+							  "unset");
+	$: titleColor = isHighlighted ? "lightyellow" : "#FAFAFA";
+	$: persistentHighlight = $contextMenuTargetSet.has(currentPathString);
+
 </script>
 
 
@@ -32,10 +42,6 @@
 		<div class="entry-stem-inner"></div>
 	</div>
 
-	<!-- <div class="title-label" style:background-color={titleColor}>
-		{title}
-	</div> -->
-
 	<slot />
 
 	{#if isHighlighted}
@@ -45,12 +51,14 @@
 			targetObject={targetObject} />
 	{/if}
 </div>
+
 </li>
 
 <style>
 	.entry-container {
 		display: flex;
 		align-items: center;
+		margin-top: 10px;
 	}
 
 	.entry-stem {
@@ -59,7 +67,6 @@
 	}
 
 	.entry-stem {
-		display: inline-block;
 		vertical-align: middle;
 		width: 8px;
 		height: 1px;
@@ -74,5 +81,12 @@
 		margin-left: -3px;
 		border:1px solid black;
 		box-sizing: border-box;
+	}
+
+	.title {
+		margin-bottom: 0px;
+		transition: background-color 0.1s;
+		list-style: none;
+		vertical-align: middle;
 	}
 </style>

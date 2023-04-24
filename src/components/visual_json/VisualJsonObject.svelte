@@ -5,6 +5,8 @@
 	import VisualJsonValue from "./VisualJsonValue.svelte";
 	import { contextMenuTargetSet } from "../../lib/State";
 	import VisualJsonEntryMenu from "./VisualJsonEntryMenu.svelte";
+	import VisualJsonEntry from "./VisualJsonEntry.svelte";
+	import VisualJsonEntryTitle from "./VisualJsonEntryTitle.svelte";
 
 	const dispatch = createEventDispatcher()
 
@@ -30,8 +32,11 @@
 	$: currentPathString =  parentPathString + getIndexRepresentation(title, parentPathString);
 	$: persistentHighlight = $contextMenuTargetSet.has(currentPathString);
 
-	function createDeleteFunction(index: number | string): () => void {
-		return () => {
+	function createDeleteFunction(index: number | string): (string) => void {
+		return (pathString: string) => {
+			$contextMenuTargetSet.delete(pathString);
+			$contextMenuTargetSet = $contextMenuTargetSet;
+			console.log($contextMenuTargetSet)
 			delete targetObject[index];
 			targetObject = targetObject;
 		}
@@ -57,51 +62,22 @@
 		dispatch("removeContextEvent", { key: currentPathString })
 	}
 
-	onDestroy(() => {
-		console.log("Destroying ", currentPathString)
-	})
-
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<li class="title"
-	on:contextmenu={contextMenuAddElement}
-	on:mouseenter={() => {isHighlighted = true;}}
-	on:mouseleave={() => {isHighlighted = false;}}
-	on:click={(e) => {persistentHighlight = !persistentHighlight;
-			if (persistentHighlight) {
-				contextMenuAddElement(e);
-			} else {
-				contextMenuRemoveElement(e);
-			}
-		}}
-	style:background-color={titleBackgroundColor}>
-
-<div class="thing-container" style="display: flex; align-items: center;">
-	<div class="line-thing" style="display: flex; align-items: center;">
-		<div class="line-thing-inner"></div>
-	</div>
-
-	<div class="title-label" style:background-color={titleColor}>
-		{title}
-	</div>
-
-	{#if isHighlighted}
-		<VisualJsonEntryMenu
-			targetObjectType={JsonType.OBJECT}
-			currentPathString={currentPathString}
-			targetObject={targetObject} />
-	{/if}
-</div>
-
-</li>
+<VisualJsonEntry
+	targetObjectType={JsonType.OBJECT}
+	currentPathString={currentPathString}
+	contextMenuAddElement={contextMenuAddElement}
+	contextMenuRemoveElement={contextMenuRemoveElement}>
+	<VisualJsonEntryTitle title={title} />
+</VisualJsonEntry>
 
 {#if !hideChildren}
 
 <li class="objectblock" style:background-color={backgroundColor}>
 	<ul class="objectblock-inner">
 		{#each Object.keys(targetObject) as key}
-			{#if getJsonType(targetObject[key]) === JsonType.OBJECT}
+			{#if getJsonType(targetObject[key]) === JsonType.OBJECT || getJsonType(targetObject[key]) === JsonType.OBJECT}
 				<li class="">
 					<svelte:self
 						on:contextEvent
@@ -143,7 +119,9 @@
 		margin-left: 20px;
 		border-left: 1px solid black;
 		padding-left: 0;
+		padding-top: 12px;
 		padding-bottom: 5px;
+		margin-bottom: 10px;
 		list-style: none;
 		box-sizing: border-box;
 		transition: background-color 0.1s;
@@ -164,51 +142,6 @@
 		margin: 0;
 		padding: 0;
 		list-style: none;
-	}
-
-	.line-thing {
-		display: inline-block;
-		vertical-align: middle;
-		width: 8px;
-		height: 1px;
-		border: none;
-		background-color: black;
-	}
-
-	.line-thing-inner {
-		width: 5px;
-		height: 5px;
-		background-color: white;
-		margin-left: -3px;
-		border:1px solid black;
-		box-sizing: border-box;
-	}
-/*
-	.line-thing::before {
-		left: -2px;
-		top: -50%;
-		width: 4px;
-		height: 4px;
-		content: "";
-		display: block;
-		position: relative;
-		background-color: black;
-	}*/
-
-	.title {
-		padding-top: 12px;
-		margin-bottom: 0px;
-		transition: background-color 0.1s;
-		list-style: none;
-		vertical-align: middle;
-	}
-
-	.title .title-label {
-		padding: 4px;
-		border: 1px solid black;
-		border-right: 5px solid blue;
-		display: inline-block;
-		background-color: #FAFAFA;
 	}
 
 	.hidden-block {

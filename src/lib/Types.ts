@@ -78,7 +78,7 @@ export enum StringIdiom {
  * Describes a right click menu for a json document.
  */
 export type ContextMenuEvent = {
-	deleteObject: () => void, // Object deletor
+	deleteObject: (path: string) => void, // Object deletor
 	togglePin: () => void, // Pin Toggler
 	isPinned: boolean, // is it pinned?
 	key: string, // The target JSON key

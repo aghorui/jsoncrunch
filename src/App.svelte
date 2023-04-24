@@ -1,3 +1,26 @@
+<!--
+  --
+  -- JsonTx - A Web UI for JSON querying, maipulating and transforming small to
+  -- medium pieces of JSON data.
+  --
+  -- Copyright (C) 2023  Anamitra Ghorui
+  --
+  -- This program is free software: you can redistribute it and/or modify
+  -- it under the terms of the GNU Affero General Public License as published by
+  -- the Free Software Foundation, either version 3 of the License, or
+  -- (at your option) any later version.
+  --
+  -- This program is distributed in the hope that it will be useful,
+  -- but WITHOUT ANY WARRANTY; without even the implied warranty of
+  -- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  -- GNU Affero General Public License for more details.
+  --
+  -- You should have received a copy of the GNU Affero General Public License
+  -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  --
+  --
+  -->
+
 <script lang="ts">
 	import AboutPopup from './components/AboutPopup.svelte';
 	import MenuBar from './components/MenuBar.svelte';
@@ -5,12 +28,13 @@
 	import PropertiesView from './components/sidebar/PropertiesView.svelte';
 	import ContextMenu from './components/visual_json/ContextMenu.svelte';
 	import VisualJsonDocument from './components/visual_json/VisualJsonDocument.svelte';
-	import { aboutPopupShown, contextMenuTargetSet, currentView, filterText, pageTitle, settingsPopupShown, textInputError } from './lib/State';
+	import { aboutPopupShown, contextMenuTargetSet, currentView, filterText, overlayCursorStyle, overlayShown, pageTitle, settingsPopupShown, textInputError } from './lib/State';
 	import { ViewportViewType, type ToggleSelectorOptions } from './lib/Types';
 	import TextView from './components/text/TextView.svelte';
 	import ToggleSelector from './components/ToggleSelector.svelte';
 	import { buildIndex, type IndexEntry } from './lib/Util';
-    import SettingsPopup from './components/SettingsPopup.svelte';
+	import SettingsPopup from './components/SettingsPopup.svelte';
+    import Overlay from './components/Overlay.svelte';
 
 	let index: Array<IndexEntry> = null
 
@@ -44,14 +68,14 @@
 		}
 	};
 
+	let finalData: object = sampleData
+
 	$: {
 		index = buildIndex(sampleData)
 		console.log(index)
 		console.log(index.filter((k) => k.key.includes("e")))
+		finalData = index.filter((k) => k.key.includes("e"))
 	}
-
-
-	let finalData: object = sampleData
 
 	let toggleOptionVisual: ToggleSelectorOptions =
 		{ key: "Visual",   value: ViewportViewType.VISUAL,   enabled: true  };
@@ -94,6 +118,7 @@
 	}
 
 	$: try {
+		console.log("Text Input Json Update")
 		sampleData = JSON.parse(textInputJson);
 		$textInputError = "";
 		toggleOptionMetadict.enabled = true;
@@ -117,6 +142,9 @@
 <div class="notification-container">
 	<Notification bind:shown={notificationShown} bind:text={notificationText} />
 </div>
+
+<!-- blocks user input -->
+<Overlay shown={$overlayShown} cursorStyle={$overlayCursorStyle}/>
 
 <AboutPopup bind:shown={$aboutPopupShown} />
 <SettingsPopup bind:shown={$settingsPopupShown} />

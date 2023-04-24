@@ -1,16 +1,44 @@
 <script lang="ts">
-    import { filterText } from "../../lib/State";
-    import PropertyButton from "./PropertyButton.svelte";
-    import PropertyLabel from "./PropertyLabel.svelte";
-import PropertySection from "./PropertySection.svelte";
-    import PropertySelector from "./PropertySelector.svelte";
-    import PropertyValueInput from "./PropertyValueInput.svelte";
+	import { filterText, overlayCursorStyle, overlayShown } from "../../lib/State";
+	import PropertyButton from "./PropertyButton.svelte";
+	import PropertyLabel from "./PropertyLabel.svelte";
+	import PropertySection from "./PropertySection.svelte";
+	import PropertySelector from "./PropertySelector.svelte";
+	import PropertyValueInput from "./PropertyValueInput.svelte";
 
+	let maxWidth: number = 250
+	let maxWidthInput: string = maxWidth + "px";
+	let splitterFocused: boolean = false;
+	let resizeStarted: boolean = false;
 
+	function updateWidth(e: MouseEvent) {
+		e.stopPropagation()
+		maxWidth = maxWidth - e.movementX;
+	}
+
+	function startUpdateWidth() {
+		$overlayShown = true;
+		$overlayCursorStyle = "ew-resize";
+		addEventListener("mousemove", updateWidth);
+		addEventListener("mouseup", stopUpdateWidth);
+	}
+
+	function stopUpdateWidth() {
+		$overlayShown = false;
+		resizeStarted = false;
+		$overlayCursorStyle = "unset";
+		removeEventListener("mousemove", updateWidth)
+	}
+
+	$: maxWidthInput = maxWidth + "px"
 </script>
 
-
-<div class="properties-view">
+<div class="properties-view" style:max-width={maxWidthInput} style:width={maxWidthInput}>
+	<div class="splitter-handle"
+		on:mousedown={(e) => { e.stopPropagation(); if (splitterFocused) { startUpdateWidth(); } }}
+		on:mouseenter={() => { splitterFocused = true; }}
+		on:mouseleave={() => { splitterFocused = false; }}>
+	</div>
 	<div class="properties-view-inner">
 		<PropertySection title={"Object Properties"}>
 			<PropertyLabel>Key:</PropertyLabel>
@@ -42,7 +70,7 @@ import PropertySection from "./PropertySection.svelte";
 .properties-view {
 	display: flex;
 	font-size: 12px;
-	flex-direction: column;
+	flex-direction: row;
 	overflow: auto;
 	min-width: 250px;
 	max-width: 250px; /* ADJUST THIS VALUE  */
@@ -52,6 +80,12 @@ import PropertySection from "./PropertySection.svelte";
 	color: white;
 	box-sizing: border-box;
 	border-left: 1px solid black;
+}
+
+.splitter-handle {
+	width: 3px;
+	background-color: black;
+	cursor: ew-resize;
 }
 
 .properties-view-inner {

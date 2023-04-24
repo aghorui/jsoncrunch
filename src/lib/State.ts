@@ -9,6 +9,10 @@ export let currentView: Writable<ViewportViewType> = writable(ViewportViewType.V
 
 export let contextMenuTargetSet: Writable<Map<string, ContextMenuEvent>> = writable(new Map<string, ContextMenuEvent>());
 
+export let overlayShown: Writable<boolean> = writable(false)
+
+export let overlayCursorStyle: Writable<string> = writable("unset")
+
 export let aboutPopupShown: Writable<boolean> = writable(false)
 
 export let settingsPopupShown: Writable<boolean> = writable(false)

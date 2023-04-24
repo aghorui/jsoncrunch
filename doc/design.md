@@ -1,10 +1,22 @@
 # Design Notes
 
-## Purpose of Application
+## Motivation and Purpose of Application
 
 The purpose of JsonTx is to create an easy to use tool for manipulation,
 presentation, data extraction and filtering of JSON Data that is convenient
 to use.
+
+* Not many GUI tools exist for viewing JSON files, querying them or editing
+  them. Have to fall back on writing small scripts to extract information or
+  change something in trivial cases.
+
+* A lot of JSON files have very common patterns (referred to as **Idioms** by
+  this app) for representing data, such as for tabulated data, tag sets,
+  date/time as strings, url strings, memos and so on. I want a tool that
+  automatically detects that and presents the object in a convenient form.
+
+* I want a tool that can filter through a JSON document based on a member's
+  path, key, value, type and so on.
 
 A rough list of features that are desired in the final application is as
 follows:
@@ -15,7 +27,7 @@ follows:
 * Insert JSON elements in blocks
 * Filter JSON Elements by, name, value, type, etc. and be able to copy them.
 * Infer the presentation method of the content by examining the structure
-  (dataset, small set, dictionary, markdown and so on)
+  (dataset, small set, dictionary, markdown and so on) (**Idioms**)
 * Store all performed transformations of data and be able to undo them.
 
 

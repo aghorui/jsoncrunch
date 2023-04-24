@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { JsonTypeNames } from "../../lib/Types";
-    import { copyText, hasWhiteSpace, isInteger } from "../../lib/Util";
+	import { JsonTypeNames } from "../../lib/Types";
+	import { copyText, hasWhiteSpace, isInteger } from "../../lib/Util";
 	export let key: string = "";
 	export let value: string|null = "";
 	export let displayValue: boolean = true;
