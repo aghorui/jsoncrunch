@@ -13,6 +13,7 @@ export let filterList: Array<IndexEntry> = []
 </script>
 
 <table class="filter-table">
+	<h2>The filtering stuff isn't quite ready yet</h2>
 	<tr>
 		<th>No.</th>
 		<th>Path</th>

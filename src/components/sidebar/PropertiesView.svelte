@@ -1,61 +1,70 @@
 <script lang="ts">
-	import { filterText, initialDocument, finalDocument, overlayCursorStyle, overlayShown, filterMode } from "../../lib/State";
-    import { buildIndex } from "../../lib/Util";
+	import { filterText, initialDocument, finalDocument, overlayCursorStyle, overlayShown, filterMode, contextMenuTargetSet, sidebarWidth } from "../../lib/State";
+	import { JsonTypeNames, type ContextMenuEvent, JsonType } from "../../lib/Types";
+	import { buildIndex } from "../../lib/Util";
+	import ValueSetterDialog from "../visual_json/ValueSetterDialog.svelte";
 	import PropertyButton from "./PropertyButton.svelte";
 	import PropertyLabel from "./PropertyLabel.svelte";
 	import PropertySection from "./PropertySection.svelte";
 	import PropertySelector from "./PropertySelector.svelte";
 	import PropertyValueInput from "./PropertyValueInput.svelte";
 
-	let maxWidth: number = 250
-	let maxWidthInput: string = maxWidth + "px";
-	let splitterFocused: boolean = false;
-	let resizeStarted: boolean = false;
+	let targetKey: string = ""
+	let targetType: JsonType = JsonType.INVALID
+	let targetTypeString: string = ""
+	let targetValue: any = null
+	let targetChildrenCount: string = ""
 
-	function updateWidth(e: MouseEvent) {
-		e.stopPropagation()
-		maxWidth = maxWidth - e.movementX;
+	$: maxWidthInput = `${$sidebarWidth}px`
+
+	$: {
+		if ($contextMenuTargetSet.size === 1) {
+			let target: ContextMenuEvent = $contextMenuTargetSet.values().next().value;
+			console.log(target);
+			targetKey = target.key;
+			targetType = target.type;
+			targetTypeString = JsonTypeNames[target.type];
+			if (target.type === JsonType.ARRAY || target.type === JsonType.OBJECT) {
+				targetChildrenCount = Object.keys(target.value).length.toString();
+			} else {
+				targetValue = target.value;
+			}
+		}
 	}
 
-	function startUpdateWidth() {
-		$overlayShown = true;
-		$overlayCursorStyle = "ew-resize";
-		addEventListener("mousemove", updateWidth);
-		addEventListener("mouseup", stopUpdateWidth);
+	function updateValue(value: any) {
+		let target: ContextMenuEvent = $contextMenuTargetSet.values().next().value;
 	}
-
-	function stopUpdateWidth() {
-		$overlayShown = false;
-		resizeStarted = false;
-		$overlayCursorStyle = "unset";
-		removeEventListener("mousemove", updateWidth)
-	}
-
-	$: maxWidthInput = maxWidth + "px"
 </script>
 
 <div class="properties-view" style:max-width={maxWidthInput} style:width={maxWidthInput}>
-	<div class="splitter-handle"
-		on:mousedown={(e) => { e.stopPropagation(); if (splitterFocused) { startUpdateWidth(); } }}
-		on:mouseenter={() => { splitterFocused = true; }}
-		on:mouseleave={() => { splitterFocused = false; }}>
-	</div>
 	<div class="properties-view-inner">
+
+		{#if $contextMenuTargetSet.size === 1}
 		<PropertySection title={"Object Properties"}>
 			<PropertyLabel>Key:</PropertyLabel>
-			<PropertyValueInput readonly={true} value="a.b" />
+			<PropertyValueInput readonly={true} value={targetKey} />
+
 			<PropertyLabel>Type:</PropertyLabel>
-			<PropertyValueInput readonly={true} value="a.b" />
-			<PropertyLabel>Children:</PropertyLabel>
-			<PropertyValueInput readonly={true} value="a.b" />
+			<PropertyValueInput readonly={true} value={targetTypeString} />
+
+			{#if targetType === JsonType.ARRAY || targetType === JsonType.OBJECT}
+				<PropertyLabel>Children:</PropertyLabel>
+				<PropertyValueInput readonly={true} value={targetChildrenCount} />
+			{:else}
+				<PropertyLabel>Value:</PropertyLabel>
+				<PropertyValueInput readonly={true} value={targetValue} />
+			{/if}
 		</PropertySection>
+		{/if}
+
 		<PropertySection title={"Filter"}>
 			<PropertyValueInput bind:value={$filterText} placeholder="enter something"/>
-			<PropertySelector options={[
+			<!-- <PropertySelector options={[
 				{ key: "Select One",   value: 1,   enabled: true  },
 				{ key: "Select Two",   value: 2,   enabled: true  },
 				{ key: "Select Three",   value: 3,   enabled: true  }
-			]} />
+			]} /> -->
 
 			<PropertyButton label="search query" onclick={() => {
 				let index = buildIndex($initialDocument)
@@ -68,7 +77,15 @@
 		<PropertySection title={"History"}>
 			There will be history in the future.
 		</PropertySection>
+
+		<PropertySection title={"Message"}>
+			Do you like using this? If you do I'd really appreciate it if you
+			would consider starring the project's Github at:
+			<a href="https://github.com/aghorui/jsoncrunch">https://github.com/jsoncrunch</a>
+		</PropertySection>
 	</div>
+
+
 </div>
 
 <style>
@@ -76,7 +93,7 @@
 .properties-view {
 	display: flex;
 	font-size: 12px;
-	flex-direction: row;
+	flex-direction: column;
 	overflow: auto;
 	min-width: 250px;
 	max-width: 250px; /* ADJUST THIS VALUE  */
@@ -86,12 +103,6 @@
 	color: white;
 	box-sizing: border-box;
 	border-left: 1px solid black;
-}
-
-.splitter-handle {
-	width: 3px;
-	background-color: black;
-	cursor: ew-resize;
 }
 
 .properties-view-inner {

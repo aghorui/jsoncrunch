@@ -1,12 +1,13 @@
 <script lang="ts">
 	export let shown: boolean = false;
+	export let title: string = "JsonTx"
 </script>
 
 {#if shown}
 
 <div class="popup-container">
 	<div class="popup">
-		<div class="title">JsonTx</div>
+		<div class="title">{title}</div>
 		<hr />
 
 		<div class="body">

@@ -59,6 +59,8 @@
 		display: flex;
 		align-items: center;
 		margin-top: 10px;
+		user-select: none;
+		cursor: pointer;
 	}
 
 	.entry-stem {

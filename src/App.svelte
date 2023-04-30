@@ -28,14 +28,18 @@
 	import PropertiesView from './components/sidebar/PropertiesView.svelte';
 	import ContextMenu from './components/visual_json/ContextMenu.svelte';
 	import VisualJsonDocument from './components/visual_json/VisualJsonDocument.svelte';
-	import { aboutPopupShown, contextMenuTargetSet, currentView, filterMode, filterText, finalDocument, initialDocument, overlayCursorStyle, overlayShown, pageTitle, settingsPopupShown, textInputError } from './lib/State';
+	import { aboutPopupShown, contextMenuTargetSet, currentView, filterMode, filterText, finalDocument, initialDocument, overlayCursorStyle, overlayShown, pageTitle, settingsPopupShown, textInputError, valueSetterPopupOnSubmit, valueSetterPopupShown, valueSetterPopupValueString, valueSetterPopupValueType } from './lib/State';
 	import { ViewportViewType, type ToggleSelectorOptions, type IndexEntry } from './lib/Types';
 	import TextView from './components/text/TextView.svelte';
 	import ToggleSelector from './components/ToggleSelector.svelte';
 	import { buildIndex } from './lib/Util';
 	import SettingsPopup from './components/SettingsPopup.svelte';
 	import Overlay from './components/Overlay.svelte';
-    import FilterTable from './components/filter_table/FilterTable.svelte';
+	import FilterTable from './components/filter_table/FilterTable.svelte';
+	import type { Writable } from 'svelte/store';
+	import Config from './lib/Config';
+	import PropertySplitter from './components/sidebar/PropertySplitter.svelte';
+	import ValueSetterPopup from './components/visual_json/ValueSetterPopup.svelte';
 
 	let index: Array<IndexEntry> = null
 
@@ -92,7 +96,7 @@
 		toggleOptionMetadict
 	];
 
-	let textInputJson: string = JSON.stringify(sampleData, null, 4);
+	let textInputJson: string = JSON.stringify(sampleData, null, Config.JSONIndentSize);
 
 	let notificationShown:boolean = false;
 	let notificationText = "";
@@ -116,18 +120,31 @@
 		$contextMenuTargetSet = $contextMenuTargetSet;
 	}
 
-	$: try {
-		sampleData = JSON.parse(textInputJson);
-		$textInputError = "";
-		toggleOptionMetadict.enabled = true;
-		toggleOptionVisual.enabled = true;
-		toggleOptions = toggleOptions;
-	} catch (e) {
-		$textInputError = e.message
-		toggleOptionMetadict.enabled = false;
-		toggleOptionVisual.enabled = false;
-		toggleOptions = toggleOptions;
+	function updateSourceView(textInputJson: string) {
+		if ($currentView === ViewportViewType.SOURCE) {
+			try {
+				sampleData = JSON.parse(textInputJson);
+				$textInputError = "";
+				toggleOptionMetadict.enabled = true;
+				toggleOptionVisual.enabled = true;
+				toggleOptions = toggleOptions;
+				$finalDocument = sampleData;
+			} catch (e) {
+				$textInputError = e.message
+				toggleOptionMetadict.enabled = false;
+				toggleOptionVisual.enabled = false;
+				toggleOptions = toggleOptions;
+			}
+		}
 	}
+
+	function treeUpdatedEventHandler(e) {
+		console.log("Tree Updated", e)
+		textInputJson = JSON.stringify($finalDocument, null, Config.JSONIndentSize)
+	}
+
+	$: updateSourceView(textInputJson);
+
 </script>
 
 <svelte:head>
@@ -146,11 +163,17 @@
 
 <AboutPopup bind:shown={$aboutPopupShown} />
 <SettingsPopup bind:shown={$settingsPopupShown} />
+<ValueSetterPopup
+	bind:shown={$valueSetterPopupShown}
+	bind:valueString={$valueSetterPopupValueString}
+	bind:valueType={$valueSetterPopupValueType}
+	bind:onSubmit={$valueSetterPopupOnSubmit}
+	/>
 
 <div style="display: flex; flex-direction: column; flex-shrink: 0; max-height: 100vh; height: 100vh;">
 	<MenuBar />
 	<div style="display: flex; flex-direction: row; flex: 1;">
-		<div style="flex: 1 0 1px; overflow: auto; display: flex; flex-direction: column; max-height: calc(100vh - 32px);">
+		<div style="flex: 1 0 1px; overflow: auto; display: flex; flex-direction: column;">
 
 			<div style="display: flex; flex-direction: row; border-bottom: 1px solid black;">
 				<ContextMenu
@@ -163,6 +186,7 @@
 			<VisualJsonDocument
 				on:contextEvent={showContextMenu}
 				on:removeContextEvent={contextMenuRemoveElement}
+				on:treeUpdatedEvent={treeUpdatedEventHandler}
 				filterMode={$filterMode}
 				targetDocument={$finalDocument}
 				targetDocumentName={"sampleData"}
@@ -175,10 +199,12 @@
 				shown={$currentView === ViewportViewType.SOURCE} />
 
 			<TextView
-				code={JSON.stringify(sampleData, null, 4)}
+				code={JSON.stringify(sampleData, null, Config.JSONIndentSize)}
 				shown={$currentView === ViewportViewType.METADICT} />
 
 		</div>
+
+		<PropertySplitter />
 
 		<PropertiesView />
 	</div>

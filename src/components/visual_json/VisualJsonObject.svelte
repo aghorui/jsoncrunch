@@ -1,25 +1,31 @@
 <script lang="ts">
 	import { createEventDispatcher, onDestroy, onMount } from "svelte";
-	import { getJsonType, JsonType, type ContextMenuEvent, type JsonPath } from "../../lib/Types";
+	import { getJsonType, JsonType, type ContextMenuEvent, type JsonPath, RightBorderStyle, type JsonValue } from "../../lib/Types";
 	import { copyText, hasWhiteSpace, isInteger, getIndexRepresentation } from "../../lib/Util";
 	import VisualJsonValue from "./VisualJsonValue.svelte";
 	import { contextMenuTargetSet } from "../../lib/State";
 	import VisualJsonEntryMenu from "./VisualJsonEntryMenu.svelte";
 	import VisualJsonEntry from "./VisualJsonEntry.svelte";
 	import VisualJsonEntryTitle from "./VisualJsonEntryTitle.svelte";
+	import VisualJsonString from "./VisualJsonString.svelte";
+	import VisualJsonNumber from "./VisualJsonNumber.svelte";
+	import VisualJsonBoolean from "./VisualJsonBoolean.svelte";
+	import VisualJsonNull from "./VisualJsonNull.svelte";
+	import Config from "../../lib/Config";
 
 	const dispatch = createEventDispatcher()
 
 	export let parentPathString: string = "";
 	export let parentPath: JsonPath = [];
 	export let title: string = "";
-	export let targetObject: object | [any] = {};
+	export let parentObject: object | any = null;
+	export let targetObject: object | any = null;
 	export let isHighlighted: boolean = false;
 	export let currentPathString: string = "";
 	export let currentPath: JsonPath = [ ...parentPath, title ];
 	export let hideChildren: boolean = false;
-
-	export let deleteObject: () => void = null;
+	export let deleteObject: (pathString: string) => void = null;
+	export let updateObject: (pathString: string, value: JsonValue) => void = null;
 
 	let persistentHighlight: boolean = false;
 
@@ -39,6 +45,17 @@
 			console.log($contextMenuTargetSet)
 			delete targetObject[index];
 			targetObject = targetObject;
+			dispatch("treeUpdatedEvent", { pathString: pathString })
+		}
+	}
+
+	function createUpdateFunction(index: number | string): (string, JsonValue) => void {
+		return (pathString: string, value: JsonValue) => {
+			console.log($contextMenuTargetSet)
+			targetObject[index] = value;
+			targetObject = targetObject;
+			$contextMenuTargetSet = $contextMenuTargetSet;
+			dispatch("treeUpdatedEvent", { pathString: pathString })
 		}
 	}
 
@@ -46,6 +63,7 @@
 		e.preventDefault();
 		let detail: ContextMenuEvent = {
 			deleteObject: deleteObject,
+			updateObject: updateObject,
 			isPinned: persistentHighlight,
 			togglePin: () => { persistentHighlight = !persistentHighlight; },
 			key: title,
@@ -69,7 +87,11 @@
 	currentPathString={currentPathString}
 	contextMenuAddElement={contextMenuAddElement}
 	contextMenuRemoveElement={contextMenuRemoveElement}>
-	<VisualJsonEntryTitle title={title} />
+	<VisualJsonEntryTitle
+		title={title}
+		displayValue={false}
+		rightBorderStyle={RightBorderStyle.TRIANGLE}
+		rightBorderColor={Config.TitleColors[JsonType.OBJECT]}/>
 </VisualJsonEntry>
 
 {#if !hideChildren}
@@ -83,21 +105,80 @@
 						on:contextEvent
 						on:removeContextEvent
 						on:clearContextEvent
+						on:treeUpdatedEvent
 						title={key}
 						deleteObject={createDeleteFunction(key)}
+						updateObject={createUpdateFunction(key)}
+						parentObject={targetObject}
 						targetObject={targetObject[key]}
 						parentPathString={currentPathString}
 						parentPath={currentPath} />
 				</li>
+			{:else if getJsonType(targetObject[key]) === JsonType.STRING}
+				<VisualJsonString
+					on:contextEvent
+					on:removeContextEvent
+					on:clearContextEvent
+					on:treeUpdatedEvent
+					key={key}
+					parentObject={targetObject}
+					value={targetObject[key]}
+					deleteObject={createDeleteFunction(key)}
+					updateObject={createUpdateFunction(key)}
+					parentPath={currentPathString}
+					valueType={getJsonType(targetObject[key])} />
+			{:else if getJsonType(targetObject[key]) === JsonType.NUMBER}
+				<VisualJsonNumber
+					on:contextEvent
+					on:removeContextEvent
+					on:clearContextEvent
+					on:treeUpdatedEvent
+					key={key}
+					parentObject={targetObject}
+					value={targetObject[key]}
+					deleteObject={createDeleteFunction(key)}
+					updateObject={createUpdateFunction(key)}
+					parentPath={currentPathString}
+					valueType={getJsonType(targetObject[key])} />
+			{:else if getJsonType(targetObject[key]) === JsonType.BOOLEAN}
+				<VisualJsonBoolean
+					on:contextEvent
+					on:removeContextEvent
+					on:clearContextEvent
+					on:treeUpdatedEvent
+					key={key}
+					parentObject={targetObject}
+					value={targetObject[key]}
+					deleteObject={createDeleteFunction(key)}
+					updateObject={createUpdateFunction(key)}
+					parentPath={currentPathString}
+					valueType={getJsonType(targetObject[key])} />
+			{:else if getJsonType(targetObject[key]) === JsonType.NULL}
+				<VisualJsonNull
+					on:contextEvent
+					on:removeContextEvent
+					on:clearContextEvent
+					on:treeUpdatedEvent
+					key={key}
+					parentObject={targetObject}
+					value={targetObject[key]}
+					deleteObject={createDeleteFunction(key)}
+					updateObject={createUpdateFunction(key)}
+					parentPath={currentPathString}
+					valueType={getJsonType(targetObject[key])} />
 			{:else}
 				<VisualJsonValue
 					on:contextEvent
 					on:removeContextEvent
 					on:clearContextEvent
+					on:treeUpdatedEvent
 					key={key}
+					parentObject={targetObject}
 					value={targetObject[key]}
+					deleteObject={createDeleteFunction(key)}
+					updateObject={createUpdateFunction(key)}
 					parentPath={currentPathString}
-					valueType={JsonType[getJsonType(targetObject[key])]} />
+					valueType={getJsonType(targetObject[key])} />
 			{/if}
 		{/each}
 	</ul>

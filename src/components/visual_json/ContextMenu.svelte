@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { valueSetterPopupOnSubmit, valueSetterPopupShown, valueSetterPopupValueString, valueSetterPopupValueType } from "../../lib/State";
 	import { isUndefinedOrNull, JsonType, JsonTypeNames, ViewportViewType, type ContextMenuEvent } from "../../lib/Types";
 	import { copyText } from "../../lib/Util";
 	import ToggleSelector from "../ToggleSelector.svelte";
@@ -6,7 +7,7 @@
 	export let targetSet: Map<string, ContextMenuEvent> = null;
 	let target: ContextMenuEvent
 
-	$: if (targetSet.size == 1) {
+	$: if (targetSet.size === 1) {
 		// grab the first value in the set
 		target = targetSet.values().next().value;
 	} else {
@@ -48,8 +49,18 @@
 		
 
 		<button type="button" on:click={() => { copyText(JSON.stringify(target.value)) }}>Copy Value</button>
+
+		<button type="button" on:click={() => {
+			$valueSetterPopupShown = true;
+			$valueSetterPopupValueType = target.type;
+			$valueSetterPopupValueString = JSON.stringify(target.value);
+			$valueSetterPopupOnSubmit = (value, type) => {
+				target.updateObject(target.path, value)
+			}
+		}}>Set Value</button>
 	{:else if targetSet.size > 1}
-		<button type="button" on:click={target.deleteObject} disabled={true}>Delete All</button>
+		<button type="button" on:click={
+			() => {for (let [_, target] of targetSet) { target.deleteObject(target.path) }}} disabled={true}>Delete All</button>
 
 		<button type="button" on:click={() => { copyText(target.path) }}>Copy Paths</button>
 
@@ -59,7 +70,10 @@
 	{/if}
 
 	{#if targetSet.size > 1}
-		<button type="button" on:click={() => { copyText(JSON.stringify(target.value)) }}>Unselect All</button>
+		<button type="button" on:click={() => {
+			targetSet.clear();
+			targetSet = targetSet;
+		 }}>Unselect All</button>
 	{/if}
 
 	<div class="spacer"> </div>

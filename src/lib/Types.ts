@@ -35,7 +35,6 @@ export type Operation = { name: string, params?: any }
 
 export type IndexEntry = { path: string, data: object, key: string, type: JsonType }
 
-
 /**
  * Describes the current view in the main viewport.
  *
@@ -75,10 +74,23 @@ export enum StringIdiom {
 
 
 /**
+ * Describes right border style of element title.
+ *
+ * @class      RightBorderStyle (name)
+ */
+export enum RightBorderStyle {
+	NORMAL,
+	TRIANGLE,
+	INVERSE_TRIANGLE,
+	RECTANGLE
+}
+
+/**
  * Describes a right click menu for a json document.
  */
 export type ContextMenuEvent = {
-	deleteObject: (path: string) => void, // Object deletor
+	deleteObject: (path: string) => void, // Object deleter
+	updateObject: (path: string, value: any) => void, // Object updater
 	togglePin: () => void, // Pin Toggler
 	isPinned: boolean, // is it pinned?
 	key: string, // The target JSON key

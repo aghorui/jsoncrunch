@@ -3,8 +3,8 @@
 	import App from "../../App.svelte";
 	import { pageTitle } from "../../lib/State";
 	import VisualJsonObject from "./VisualJsonObject.svelte";
-    import FilterTable from "../filter_table/FilterTable.svelte";
-    import type { IndexEntry } from "../../lib/Types";
+	import FilterTable from "../filter_table/FilterTable.svelte";
+	import type { IndexEntry } from "../../lib/Types";
 
 	export let targetDocumentName: string = "";
 	export let targetDocument: object | Array<any> = {};
@@ -32,6 +32,7 @@
 				on:contextEvent
 				on:removeContextEvent
 				on:clearContextEvent
+				on:treeUpdatedEvent
 				title={"root"}
 				targetObject={targetDocument}
 				parentPathString={""} />
