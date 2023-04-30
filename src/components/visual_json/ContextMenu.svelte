@@ -35,14 +35,13 @@
 	<!-- <button type="button" on:click={togglePin} disabled={togglePin === null}>
 		{#if target.persistentHighlight}Unpin{:else}Pin{/if}
 	</button>
-
+ -->
 	<button type="button">Info</button>
-	 -->
 
 	{#if targetSet.size === 1}
-		<!-- <button type="button" disabled={target.deleteObject === null}>Subtree</button>
+		<!-- <button type="button" disabled={target.deleteObject === null}>Subtree</button> -->
 
-		<button type="button" on:click={() => target.deleteObject(target.path)} disabled={target.deleteObject === null}>Delete</button> -->
+		<button type="button" on:click={() => target.deleteObject(target.path)} disabled={target.deleteObject === null}>Delete</button>
 
 		<button type="button" on:click={() => { copyText(target.path) }}>Copy Path</button>
 

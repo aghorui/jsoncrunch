@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build-custom": "vite build --outDir '../jsoncrunch-deploy/files' --base /jsoncrunch/ --emptyOutDir",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json"
   },

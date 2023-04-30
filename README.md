@@ -5,6 +5,8 @@ manipulating small to medium size pieces of JSON data.
 
 ![screenshot][screenshot]
 
+**[Open in Browser][applink]**
+
 ## Motivation
 
 * Not many GUI tools exist for viewing JSON files, querying them or editing
@@ -76,14 +78,6 @@ http-server
 This will open a server on your local machine that's hosting JsonCrunch. The url
 to access it will be shown in the terminal.
 
-## Features
-
-* TODO
-
-## General Usage
-
-* TODO
-
 ## License
 
 This software is available under the AGPLv3. Please see [LICENSE.txt][license]
@@ -107,6 +101,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ```
 
+[applink]: http://aghorui.github.io/jsontx
 [screenshot]: ./doc/media/screenshot.png
 [license]:    ./LICENSE.txt
 [nodejs]:     https://nodejs.org

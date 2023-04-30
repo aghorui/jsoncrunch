@@ -6,6 +6,6 @@
 <Popup bind:shown={shown}>
 	© 2023 aghorui <br /><br />
 	This software is available under the GNU Affero General Public License Version 3.<br /><br />
-	<a href="aghorui.github.io">Website</a><br /><br />
-	<a href="aghorui.github.io">Source Code</a><br /><br />
+	<a href="https://aghorui.github.io">Website</a><br /><br />
+	<a href="https://github.com/aghorui/jsoncrunch">Source Code</a><br /><br />
 </Popup>

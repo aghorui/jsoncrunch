@@ -85,7 +85,7 @@
 		<PropertySection title={"Message"}>
 			Do you like using this? If you do I'd really appreciate it if you
 			would consider starring the project's Github at:
-			<a href="https://github.com/aghorui/jsoncrunch">https://github.com/jsoncrunch</a>
+			<a href="https://github.com/aghorui/jsoncrunch">https://github.com/aghorui/jsoncrunch</a>
 		</PropertySection>
 	</div>
 
