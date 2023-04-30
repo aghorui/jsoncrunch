@@ -3,9 +3,9 @@
 JsonCrunch is a JSON viewing, transformation and querying tool meant for quickly
 manipulating small to medium size pieces of JSON data.
 
-![screenshot][screenshot]
-
 **[Open in Browser][applink]**
+
+![screenshot][screenshot]
 
 ## Motivation
 
@@ -75,7 +75,7 @@ cd ./dist
 http-server
 ```
 
-This will open a server on your local machine that's hosting JsonCrunch. The url
+This will open a server that's hosting JsonCrunch on your local machine. The url
 to access it will be shown in the terminal.
 
 ## License
@@ -101,7 +101,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ```
 
-[applink]: http://aghorui.github.io/jsontx
+[applink]: http://aghorui.github.io/jsoncrunch
 [screenshot]: ./doc/media/screenshot.png
 [license]:    ./LICENSE.txt
 [nodejs]:     https://nodejs.org
