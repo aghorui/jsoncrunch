@@ -83,7 +83,8 @@
 </script>
 
 <VisualJsonEntry
-	targetObjectType={JsonType.OBJECT}
+	valueType={JsonType.OBJECT}
+	value={targetObject}
 	currentPathString={currentPathString}
 	contextMenuAddElement={contextMenuAddElement}
 	contextMenuRemoveElement={contextMenuRemoveElement}>

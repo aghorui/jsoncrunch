@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { contextMenuTargetSet } from "../../lib/State";
-	import { JsonType } from "../../lib/Types";
+	import { JsonType, type JsonValue } from "../../lib/Types";
 	import VisualJsonEntryMenu from "./VisualJsonEntryMenu.svelte";
 
 	export let titleBackgroundColor: string = "";
-	export let targetObjectType: JsonType = JsonType.INVALID;
-	export let targetObject: object | [any] = {};
+	export let valueType: JsonType = JsonType.INVALID;
+	export let value: JsonValue = null;
 	export let isHighlighted: boolean = false;
 	export let currentPathString: string = "(no path)";
 	export let contextMenuAddElement: (Event) => void = null
@@ -46,9 +46,9 @@
 
 	{#if isHighlighted}
 		<VisualJsonEntryMenu
-			targetObjectType={targetObjectType}
+			valueType={valueType}
 			currentPathString={currentPathString}
-			targetObject={targetObject} />
+			value={value} />
 	{/if}
 </div>
 

@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { JsonType, JsonTypeNames } from "../../lib/Types";
+	import { JsonType, JsonTypeNames, type JsonValue } from "../../lib/Types";
 	import { copyText } from "../../lib/Util";
-	export let targetObjectType: JsonType = JsonType.INVALID;
+	export let valueType: JsonType = JsonType.INVALID;
 	export let currentPathString: string = "(no path)";
-	export let targetObject: object = null;
+	export let value: JsonValue = null;
 
 </script>
 
@@ -25,14 +25,14 @@
 	</button>
 
 	<button type="button"
-		on:click|stopPropagation={() => { copyText(JSON.stringify(targetObject, null, 4)) }}>
+		on:click|stopPropagation={() => { copyText(JSON.stringify(value, null, 4)) }}>
 		Copy Value
 	</button>
 
 	<slot />
 
 	<div class="path-display">
-		{currentPathString} : <i>{JsonTypeNames[targetObjectType]}</i>
+		{currentPathString} : <i>{JsonTypeNames[valueType]}</i>
 	</div>
 </div>
 

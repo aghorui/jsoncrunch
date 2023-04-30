@@ -52,7 +52,8 @@
 
 
 <VisualJsonEntry
-	targetObjectType={valueType}
+	valueType={valueType}
+	value={value}
 	currentPathString={currentPathString}
 	contextMenuAddElement={contextMenuAddElement}
 	contextMenuRemoveElement={contextMenuRemoveElement}>
