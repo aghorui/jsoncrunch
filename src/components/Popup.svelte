@@ -1,6 +1,8 @@
 <script lang="ts">
+    import AppInfo from "../lib/AppInfo";
+
 	export let shown: boolean = false;
-	export let title: string = "JsonTx"
+	export let title: string = AppInfo.appName;
 </script>
 
 {#if shown}

@@ -15,7 +15,7 @@
 </script>
 
 <div class="message" style:display={shown ? "flex" : "none"}>
-<div class="title">Hi, Welcome to JsonTx! To visualize your own JSON, click on the "Source" tab below and paste your data.</div>
+<div class="title">Hi, Welcome to {AppInfo.appName}! To visualize your own JSON, click on the "Source" tab below and paste your data.</div>
 <div class="spacer"></div>
 <button on:click={closeIntroMessage} class="item">Close [X]</button>
 </div>

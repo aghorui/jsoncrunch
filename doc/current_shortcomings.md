@@ -8,4 +8,4 @@ necessarily bugs).
 * Filtering is currently broken
 * Schemas and idioms are yet to be implemented.
 * Handling edge cases for the root node is not complete
-* Options in the Context Menu are not exhaustive
+* Options in the Context Menu are not exhaustive.

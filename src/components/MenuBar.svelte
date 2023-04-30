@@ -4,7 +4,7 @@
 </script>
 
 <div class="menubar">
-<item class="title" disabled={true}>JsonTx {AppInfo.appVersion}</item>
+<item class="title" disabled={true}>{AppInfo.appName} {AppInfo.appVersion}</item>
 <div class="spacer"></div>
 <button on:click={() => { $aboutPopupShown = true; }} class="item">About</button>
 <button on:click={() => { $settingsPopupShown = true; }} class="item">Settings</button>

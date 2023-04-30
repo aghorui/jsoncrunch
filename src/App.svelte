@@ -1,7 +1,7 @@
 <!--
   --
-  -- JsonTx - A Web UI for JSON querying, maipulating and transforming small to
-  -- medium pieces of JSON data.
+  -- JsonCrunch - A Web UI for JSON querying, maipulating and transforming small
+  -- to medium pieces of JSON data.
   --
   -- Copyright (C) 2023  Anamitra Ghorui
   --

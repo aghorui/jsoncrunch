@@ -1,6 +1,6 @@
-# JsonTx
+# JsonCrunch
 
-JsonTx is a JSON viewing, transformation and querying tool meant for quickly
+JsonCrunch is a JSON viewing, transformation and querying tool meant for quickly
 manipulating small to medium size pieces of JSON data.
 
 ![screenshot][screenshot]
@@ -33,8 +33,8 @@ You will need [NodeJS][nodejs] (>= v16.17.0) and NPM (>= v8.15.0) installed.
    directory.
 
 ```
-git clone https://github.com/aghorui/jsontx
-cd jsontx
+git clone https://github.com/aghorui/jsoncrunch
+cd jsoncrunch
 ```
 
 2. Install dependencies.
@@ -43,19 +43,19 @@ cd jsontx
 npm install
 ```
 
-3. To immediately run JsonTx, run the following command:
+3. To immediately run JsonCrunch, run the following command:
 
 ```
 npm run dev
 ```
 
 This will start a webserver in localhost at a certain port number from which the
-application can be used. The full address to access the JsonTx instance will be
+application can be used. The full address to access the JsonCrunch instance will be
 displayed in the terminal after you run the command.
 
-If you want to build JsonTx instead, follow the next step.
+If you want to build JsonCrunch instead, follow the next step.
 
-4. To build JsonTx, run the following command:
+4. To build JsonCrunch, run the following command:
 
 ```
 npm run build
@@ -73,7 +73,7 @@ cd ./dist
 http-server
 ```
 
-This will open a server on your local machine that's hosting JsonTx. The url
+This will open a server on your local machine that's hosting JsonCrunch. The url
 to access it will be shown in the terminal.
 
 ## Features

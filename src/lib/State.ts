@@ -3,7 +3,7 @@ import { JsonType, ViewportViewType, type ContextMenuEvent, type JsonValue } fro
 
 export let hightlightedJsonElement: object = null
 
-export let pageTitle: Writable<string> = writable("JsonTx")
+export let pageTitle: Writable<string> = writable("JsonCrunch")
 
 export let currentView: Writable<ViewportViewType> = writable(ViewportViewType.VISUAL)
 

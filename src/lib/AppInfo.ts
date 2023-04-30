@@ -1,5 +1,5 @@
 
 export default {
-	appName: "JsonTx",
-	appVersion: "0.0.1-alpha"
+	appName: "JsonCrunch",
+	appVersion: "0.0.2"
 } as const;

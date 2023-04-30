@@ -5,6 +5,7 @@
 	import VisualJsonObject from "./VisualJsonObject.svelte";
 	import FilterTable from "../filter_table/FilterTable.svelte";
 	import type { IndexEntry } from "../../lib/Types";
+    import AppInfo from "../../lib/AppInfo";
 
 	export let targetDocumentName: string = "";
 	export let targetDocument: object | Array<any> = {};
@@ -12,11 +13,11 @@
 	export let shown: boolean = false;
 
 	onMount(() => {
-		$pageTitle = targetDocumentName + " - JsonTx";
+		$pageTitle = targetDocumentName + ` - ${AppInfo.appName}`;
 	})
 
 
-	$: $pageTitle = targetDocumentName + " - JsonTx";
+	$: $pageTitle = targetDocumentName + ` - ${AppInfo.appName}`;
 
 	$: thing = targetDocument as Array<IndexEntry>
 </script>

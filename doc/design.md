@@ -2,7 +2,7 @@
 
 ## Motivation and Purpose of Application
 
-The purpose of JsonTx is to create an easy to use tool for manipulation,
+The purpose of JsonCrunch is to create an easy to use tool for manipulation,
 presentation, data extraction and filtering of JSON Data that is convenient
 to use.
 
@@ -42,7 +42,7 @@ follows:
 
 ## Metadict
 
-* The metadict contains information that is specific to JsonTx about how to
+* The metadict contains information that is specific to JsonCrunch about how to
   present, filter, or do anything with the JSON Data.
 * The metadict is stored separately from the JSON Data.
 

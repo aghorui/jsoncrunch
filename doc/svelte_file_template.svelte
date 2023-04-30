@@ -1,7 +1,7 @@
 <!--
 	file name: file description
 
-	This file is part of JsonTx.
+	This file is part of JsonCrunch.
 -->
 
 <script lang="ts">

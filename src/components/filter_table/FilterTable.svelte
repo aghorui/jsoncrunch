@@ -1,7 +1,7 @@
 <!--
 	FilterTable.svelte: Creates a table for filter results.
 
-	This file is part of JsonTx.
+	This file is part of JsonCrunch.
 -->
 
 <script lang="ts">
