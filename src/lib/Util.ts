@@ -17,6 +17,26 @@ export function copyText(text: string) {
 }
 
 /**
+ * Gets text from Clipboard
+ *
+ * @return     {string}  The clipboard text.
+ */
+export function getClipboardText(): string {
+	if (!navigator.clipboard) {
+		console.log("navigator.clipboard not supported by the browser.");
+	}
+
+	let text: string = ""
+
+	navigator.clipboard.readText().then(
+		(value) => { text = value },
+		(err) => { console.log(err); }
+	)
+
+	return text
+}
+
+/**
  * Creates an empty object without any prototype.
  */
 export function createEmptyObject(): {} {

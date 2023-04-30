@@ -40,6 +40,7 @@
 	import Config from './lib/Config';
 	import PropertySplitter from './components/sidebar/PropertySplitter.svelte';
 	import ValueSetterPopup from './components/visual_json/ValueSetterPopup.svelte';
+	import IntroMessage from './components/IntroMessage.svelte';
 
 	let index: Array<IndexEntry> = null
 
@@ -93,7 +94,7 @@
 	let toggleOptions: Array<ToggleSelectorOptions> = [
 		toggleOptionVisual,
 		toggleOptionSource,
-		toggleOptionMetadict
+		/*toggleOptionMetadict*/
 	];
 
 	let textInputJson: string = JSON.stringify(sampleData, null, Config.JSONIndentSize);
@@ -172,6 +173,7 @@
 
 <div style="display: flex; flex-direction: column; flex-shrink: 0; max-height: 100vh; height: 100vh;">
 	<MenuBar />
+	<IntroMessage />
 	<div style="display: flex; flex-direction: row; flex: 1;">
 		<div style="flex: 1 0 1px; overflow: auto; display: flex; flex-direction: column;">
 

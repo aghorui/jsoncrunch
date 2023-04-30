@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { valueSetterPopupOnSubmit, valueSetterPopupShown, valueSetterPopupValueString, valueSetterPopupValueType } from "../../lib/State";
+	import { valueSetterPopupOnSubmit, valueSetterPopupShown, valueSetterPopupValueString, valueSetterPopupValueType } from "../../lib/State";
 	import { isUndefinedOrNull, JsonType, JsonTypeNames, ViewportViewType, type ContextMenuEvent } from "../../lib/Types";
 	import { copyText } from "../../lib/Util";
 	import ToggleSelector from "../ToggleSelector.svelte";
@@ -14,16 +14,16 @@
 		target = null;
 	}
 
-	function deleteAll() {
-/*		let list = [ ...targetSet.keys() ].sort()
+	/*function deleteAll() {
+		let list = [ ...targetSet.keys() ].sort()
 		for (let i of list) {
 			i.deleteObject();
 		}
 
 		targetSet.clear();
-		targetSet = targetSet;*/
+		targetSet = targetSet;
 		// not implemented
-	}
+	}*/
 
 </script>
 
@@ -35,13 +35,14 @@
 	<!-- <button type="button" on:click={togglePin} disabled={togglePin === null}>
 		{#if target.persistentHighlight}Unpin{:else}Pin{/if}
 	</button>
- -->
+
 	<button type="button">Info</button>
+	 -->
 
 	{#if targetSet.size === 1}
-		<button type="button" disabled={target.deleteObject === null}>Subtree</button>
+		<!-- <button type="button" disabled={target.deleteObject === null}>Subtree</button>
 
-		<button type="button" on:click={() => target.deleteObject(target.path)} disabled={target.deleteObject === null}>Delete</button>
+		<button type="button" on:click={() => target.deleteObject(target.path)} disabled={target.deleteObject === null}>Delete</button> -->
 
 		<button type="button" on:click={() => { copyText(target.path) }}>Copy Path</button>
 
@@ -60,13 +61,13 @@
 		}}>Set Value</button>
 	{:else if targetSet.size > 1}
 		<button type="button" on:click={
-			() => {for (let [_, target] of targetSet) { target.deleteObject(target.path) }}} disabled={true}>Delete All</button>
+			() => {for (let [_, target] of targetSet) { if (target.deleteObject) target.deleteObject(target.path) }}} disabled={true}>Delete All</button>
 
-		<button type="button" on:click={() => { copyText(target.path) }}>Copy Paths</button>
+		<button type="button" on:click={() => { copyText(JSON.stringify(targetSet.keys())) }}>Copy Paths</button>
 
-		<button type="button" on:click={() => { copyText(target.key) }}>Copy Keys</button>
+		<button type="button" on:click={() => { copyText(JSON.stringify(Array.from(targetSet.values()).map((value) => value.key)))}}>Copy Keys</button>
 
-		<button type="button" on:click={() => { copyText(JSON.stringify(target.value)) }}>Copy Values</button>
+		<button type="button" on:click={() => { copyText(JSON.stringify(Array.from(targetSet.values()).map((value) => value.value))) }}>Copy Values</button>
 	{/if}
 
 	{#if targetSet.size > 1}

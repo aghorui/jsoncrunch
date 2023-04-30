@@ -72,7 +72,11 @@
 				$finalDocument = index.filter((k) => k.key.includes($filterText))
 				$filterMode = true;
 			 }}/>
-			<PropertyButton label="reset"/>
+			<PropertyButton label="reset" onclick={() => {
+				$filterMode = false;
+				$filterText = "";
+				$finalDocument = $initialDocument;
+			}}/>
 		</PropertySection>
 		<PropertySection title={"History"}>
 			There will be history in the future.

@@ -12,7 +12,7 @@
 		{#if persistentHighlight}Unpin{:else}Pin{/if}
 	</button> -->
 
-	<button on:click|stopPropagation type="button">Info</button>
+	<!-- <button on:click|stopPropagation type="button">Info</button> -->
 
 	<!-- <button type="button" disabled={deleteObject === null} on:click|stopPropagation={() => {if (deleteObject) deleteObject()}}>Delete</button> -->
 
