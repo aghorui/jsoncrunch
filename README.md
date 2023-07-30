@@ -21,8 +21,6 @@ manipulating small to medium size pieces of JSON data.
 * I want a tool that can filter through a JSON document based on a member's
   path, key, value, type and so on.
 
-* <small>~~padding out my resume~~</small>
-
 ## Setup
 
 ### Prerequisites
